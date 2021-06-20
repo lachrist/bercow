@@ -1,0 +1,33 @@
+{
+  "name": "test-turtle",
+  "version": "0.0.0",
+  "keywords": [
+    "test",
+    "runner",
+    "memoization",
+    "coverage",
+    "c8"
+  ],
+  "scripts": {
+    "lint": "npx eslint 'lib/*.js'",
+    "cov": "npx c8 --reporter html --include $COV.js node $COV.test.js && open coverage/index.html",
+    "prettier": "npx prettier --write 'lib/*.js'"
+  },
+  "files": [
+    "/lib/main.js",
+    "/lib/bin.js"
+  ],
+  "bin": {
+    "test-turtle": "/lib/bin.mjs",
+    "tt": "/lib/bin.js"
+  },
+  "main": "/lib/main.js",
+  "devDependencies": {
+    "eslint": "^7.29.0",
+    "prettier": "^2.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lachrist/test-turtle.git"
+  }
+}
