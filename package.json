@@ -18,6 +18,7 @@
     "/lib/main.js",
     "/lib/bin.js"
   ],
+  "main": "/lib/main.js",
   "bin": {
     "test-turtle": "/lib/bin.mjs",
     "tt": "/lib/bin.js"
