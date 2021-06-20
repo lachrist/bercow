@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "lint": "npx eslint 'lib/*.js'",
-    "cov": "npx c8 --reporter html --include $COV.js node $COV.test.js && open coverage/index.html",
+    "cov": "npx c8 --reporter html --include lib/main.js --include lib/bin.js node lib/test.js && open coverage/index.html",
+    "test": "node lib/test.js",
     "prettier": "npx prettier --write 'lib/*.js'"
   },
   "files": [
@@ -29,5 +30,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/lachrist/test-turtle.git"
+  },
+  "dependencies": {
+    "c8": "^7.7.3",
+    "minimist": "^1.2.5"
   }
 }
