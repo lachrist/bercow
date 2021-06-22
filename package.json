@@ -1,6 +1,6 @@
 {
   "name": "test-turtle",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "keywords": [
     "test",
     "runner",
@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "lint": "npx eslint 'lib/*.js'",
-    "test": "node lib/assert.test.js && node lib/main.test.js && node lib/bin.test.js",
+    "test": "node lib/assert.test.js && node lib/spawn.test.js && node lib/main.test.js && node lib/bin.test.js",
     "test-cov": "node lib/bin.js lib",
     "prettier": "npx prettier --write 'lib/*.js'"
   },
