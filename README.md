@@ -1,14 +1,15 @@
 # test-turtle
 
 This module a simple test runner which uses memoization and requires a module ordering.
-The key idea behind it is that when modifying a module (or its test file), the modules below it (ie the modules that do not depend on it) do not need to be re-tested.
+The key idea of this package it is that when modifying a module (or its test file), the modules below it in the ordering (ie the modules that do not depend on it) do not need to be re-tested.
 
 ## Requirements
 
 1. *`.test.js` test file convention:* Unit test files are put next to the file that they are testing and they are named based to the file they are testing. For instance: `foo.js` and `foo.test.js`.
-2. *No cyclic dependencies between modules:* There must exists a strict ordering of modules such that a module may only require modules strictly lower than itself. For instance, given the ordering `foo.js < bar.js`, `bar.js` may require `foo.js` but not the reverse.
-3. *The module ordering must respect directory layout:* An ordering cannot interleave the modules of a directory with outside modules. For instance `dir/foo.js < bar.js < dir/qux.js` is invalid but `bar.js < dir/foo.js < dir/qux.js` and `dir/foo.js < dir/qux.js < bar.js` are both valid ordering.
-4. *Presence of `test.conf` files:* Every directory (deeply) containing source code to test should contain a `.test.conf` file. This file provides two information: the order in which the directory's files should be tested and for each of these file, a memoization of the last successful test run. 
+2. *Consistent file extensions:* JavaScript file extensions should be same across the entire project (ie either '.js', '.mjs', or '.cjs'). 
+3. *No cyclic dependencies between modules:* There must exists a strict ordering of modules such that a module may only require modules strictly lower than itself. For instance, given the ordering `foo.js < bar.js`, `bar.js` may require `foo.js` but not the reverse.
+4. *The module ordering must respect directory layout:* An ordering cannot interleave the modules of a directory with outside modules. For instance `dir/foo.js < bar.js < dir/qux.js` is invalid but `bar.js < dir/foo.js < dir/qux.js` and `dir/foo.js < dir/qux.js < bar.js` are both valid ordering.
+5. *Presence of `test.conf` files:* Every directory (deeply) containing source code to test should contain a `.test.conf` file. This file provides two information: the order in which the directory's files should be tested and for each of these file, a memoization of the last successful test run. 
 
 ## Example
 
@@ -23,7 +24,7 @@ npm i
 First run:
 
 ```sh
-node lib/bin.js sample
+node lib/bin.js sample --each 'npx c8 --include $1 -- node $2'
 running  sample/foo...
 ----------|---------|----------|---------|---------|-------------------
 File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
@@ -50,7 +51,7 @@ All files |     100 |      100 |     100 |     100 |
 Second run:
 
 ```sh
-node lib/bin.js sample
+node lib/bin.js sample --each 'npx c8 --include $1 -- node $2'
 memoized sample/foo
 memoized sample/bar/index
 memoized sample/qux
@@ -68,6 +69,7 @@ echo '
 Third run:
 
 ```sh
+node lib/bin.js sample --each 'npx c8 --include $1 -- node $2'
 memoized sample/foo
 running  sample/bar/index...
 /Users/soft/Desktop/workspace/test-turtle/sample/bar/index.test.js:3
@@ -104,6 +106,7 @@ usage: npx test-turtle <dir>
   <dir>: the root directory to start testing from
   --ext: the file extension used by the project, it
          is curently not possible to mix extensions
-  --cov: the minimum coverage threshold (0, 100)
   --no-memo: disable memoization
+  --each: command(s) to run on each test
+  --help: print this message
 ```
