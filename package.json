@@ -1,6 +1,6 @@
 {
   "name": "test-turtle",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "keywords": [
     "test",
     "runner",
@@ -9,18 +9,19 @@
     "c8"
   ],
   "scripts": {
-    "test": "node lib/bin.js lib --each 'npx eslint $1 $2' --each 'npx prettier -w $1 $2' --each 'node $2' --each 'npx c8 --check-coverage --branches 100 --functions 100 --include $1 -- node $2'"
+    "turtle": "node bin/bin.mjs 'npx eslint $1 $2 && npx prettier -w $1 $2 && node $2 && npx c8 --check-coverage --branches 100 --functions 100 --include $1 -- node $2'"
   },
   "files": [
-    "/lib/assert.js",
-    "/lib/spawn.js",
-    "/lib/main.js",
-    "/lib/bin.js"
+    "/lib/assert.mjs",
+    "/lib/log.mjs",
+    "/lib/spawn.mjs",
+    "/lib/index.mjs",
+    "/lib/main.mjs",
+    "/bin/bin.mjs"
   ],
-  "main": "/lib/main.js",
+  "main": "/lib/index.js",
   "bin": {
-    "test-turtle": "/lib/bin.js",
-    "tt": "/lib/bin.js"
+    "test-turtle": "/bin/bin.mjs"
   },
   "devDependencies": {
     "c8": "^7.7.3",
@@ -33,8 +34,7 @@
   },
   "dependencies": {
     "chalk": "^4.1.1",
-    "commitizen": "^4.2.4",
-    "g": "^2.0.1",
+    "list-lang": "^0.0.0",
     "minimist": "^1.2.5"
   }
 }

@@ -1,4 +1,4 @@
-const {getFooBar} = require("./index.js");
-if (getFooBar() !== "foobar") {
-  throw new Error("expected 'foobar'");
+const {getBar} = require("./index.js");
+if (getBar() !== "bar") {
+  throw new Error("expected 'bar'");
 }

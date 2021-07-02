@@ -1,2 +1,2 @@
-const {getFoo} = require("../foo.js");
-exports.getFooBar = () => `${getFoo()}bar`;
+
+exports.getBar = () => `bar`;

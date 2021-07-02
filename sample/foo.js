@@ -1,1 +1,1 @@
-exports.getFoo = () => "foo";
+exports.getFoo = () => "f" + "oo";
