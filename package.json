@@ -9,6 +9,9 @@
     "c8"
   ],
   "scripts": {
+    "lint": "npx eslint 'lib/*.mjs'",
+    "prettify": "npx prettier -w 'lib/*.mjs'",
+    "test": "node lib/util.test.mjs && node lib/either.test.mjs && node lib/index.test.mjs && node lib/main.test.mjs && node lib/bin.test.mjs",
     "turtle": "node bin/bin.mjs 'npx eslint $1 $2 && npx prettier -w $1 $2 && node $2 && npx c8 --check-coverage --branches 100 --functions 100 --include $1 -- node $2'"
   },
   "files": [

@@ -1,5 +1,4 @@
-- * assert.mjs
-  * log.mjs
-- * spawn.mjs
-  * index.mjs
+- util.mjs
+- index.mjs
 - main.mjs
+- bin.mjs
