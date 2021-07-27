@@ -1,6 +1,6 @@
 {
   "name": "test-turtle",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "keywords": [
     "test",
     "runner",
@@ -14,14 +14,7 @@
     "test": "node lib/util.test.mjs && node lib/either.test.mjs && node lib/index.test.mjs && node lib/main.test.mjs && node lib/bin.test.mjs",
     "turtle": "node lib/bin.mjs --layout alongside -- 'npx eslint $1 $2 && npx prettier -w $1 $2 && node $2 && npx c8 --check-coverage --branches 100 --functions 100 --include $1 -- node $2'"
   },
-  "files": [
-    "/lib/assert.mjs",
-    "/lib/log.mjs",
-    "/lib/spawn.mjs",
-    "/lib/index.mjs",
-    "/lib/main.mjs",
-    "/bin/bin.mjs"
-  ],
+  "files": ["/lib/*.mjs"],
   "main": "/lib/index.js",
   "bin": {
     "test-turtle": "/lib/bin.mjs"
