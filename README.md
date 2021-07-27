@@ -1,7 +1,7 @@
 # test-turtle
 
 This package a simple language-agnostic test runner which uses memoization based on file dependency information provided by the user.
-The problem that this package is trying to solve is re-testing files that are known to be unaffected by a change.
+The problem that this package is trying to solve is avoiding to re-test files that are known to be unaffected by a change.
 
 ## Requirements
 
@@ -10,7 +10,23 @@ The problem that this package is trying to solve is re-testing files that are kn
 3. *Single directory:* This package does not visit directories multiple times. Hence the directory layout must be reflected by the ordering. For instance the imports `foo < lib/bar < qux` are fine. But the imports `foo < lib/bar < qux < lib/buz` cannot be handled by this package.
 4. *Ordering files:* Every directory (deeply) containing files to test should contain a file (named `.test.list` by  default) which provide a partial ordering of the elements of the directory.
 
-## Example
+## Getting Started
+
+```
+npm install test-turtle
+npx test-turtle --target <target> --format <format> -- 'node $2'
+```
+
+- `target`: the directory to start collecting files.
+- `format`: specify how to fetch test files.
+  - `"separated"`: the test files are located in the dedicated `test/` directory which mirrors the `lib/` directory.
+  - `"alongside"`: the test files are located alongside the file they are testing with an additional `.test` extension -- eg: `foo.js` and `foo.test.js`.
+
+**Warning**
+By default all files are considered to be independent from each others.
+Specifying dependencies requires the presence of ordering files.
+
+## Demonstration
 
 Installation:
 
@@ -18,13 +34,14 @@ Installation:
 git clone https://github.com/lachrist/test-turtle.git
 cd test-turtle
 npm i
+cd sample
 ```
 
 First run (everything is tested):
 
 ```sh
-node bin/bin.mjs --target sample 'npx c8 --include $1 -- node $2'
-sample/foo.js...
+node ../lib/bin.mjs 'npx c8 --include $1 -- node $2'
+foo.js...
 ----------|---------|----------|---------|---------|-------------------
 File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
 ----------|---------|----------|---------|---------|-------------------
@@ -32,7 +49,7 @@ All files |     100 |      100 |     100 |     100 |
  foo.js   |     100 |      100 |     100 |     100 |                   
 ----------|---------|----------|---------|---------|-------------------
 > Success
-sample/bar/index.js...
+bar/index.js...
 ----------|---------|----------|---------|---------|-------------------
 File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
 ----------|---------|----------|---------|---------|-------------------
@@ -40,7 +57,7 @@ All files |     100 |      100 |     100 |     100 |
  index.js |     100 |      100 |     100 |     100 |                   
 ----------|---------|----------|---------|---------|-------------------
 > Success
-sample/foobar.js...
+foobar.js...
 -----------|---------|----------|---------|---------|-------------------
 File       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
 -----------|---------|----------|---------|---------|-------------------
@@ -119,7 +136,7 @@ filename1 < filename2
 directory2 < filename2
 ```
 
-Note that there is not ordering between `filename1` and `directory2`.
+Note that there is no ordering between `filename1` and `directory2`.
 
 ## CLI
 
@@ -130,24 +147,39 @@ usage: npx test-turtle <command>
       First argument: relative path of the target file.
       Second argument: relative path of the test file.
       Example: "npx c8 --include $1 -- node $2"
+  --stdio
+      What to do with the command's stdio
+      Default: "inherit"
+  --timeout
+      The number of millisecond before sending SIGTERM to the command.
+      One second later, SIGKILL will be send.
+      Default: 0 (no timeout)
   --target
-      Path to the root directory from which to start testing files.
+      The root directory from which to start exploring.
       Default: "."
-  --replace-regexp-body
-      The body of a regular expression to extract parts from target file.
-      Default: "^(.*)\.([a-z])$"
-  --replace-regexp-flags
-      The flags of a regular expression to extract parts from target file,
-      Default: "u"
-  --replace-template
-      The template to replace the parts of the target file.
-      Default: "$1.test.$2"
   --layout-filename
       The name of the file indicating test layout.
       Default: ".test.list"
-  --memoization-filename
-      The name of the file to store memoization data.
+  --memoization-path
+      The path to the file for reading and writing memoization data.
       Default: ".turtle.json"
+  --layout
+      Use a predefined layout: ["alongside","separated"].
+      This option overrides the '--format' and '--filter' options.
+  --format-regexp
+      A regular expression to decompose the parts of a target's relative path.
+  --format-regexp-flags
+      The flags to use for --format-regexp
+      Default: "u"
+  --format-template
+      The template string to format the parts of the target file.
+  --filter-regexp
+      Regular expression to indicate whether a file should be tested
+      when no layout file is present in the directory.
+      Default: "^[^.]"
+  --filter-regexp-flags
+      The flags to use for --filter-regexp.
+      Default: "u
   --no-memoization
       Disable memoization.
   --help
