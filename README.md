@@ -165,7 +165,7 @@ usage: npx test-turtle <command>
       Default: ".turtle.json"
   --layout
       Use a predefined layout: ["alongside","separated"].
-      This option overrides the '--format' and '--filter' options.
+      This option overrides the '--format' and '--exclude' options.
   --format-regexp
       A regular expression to decompose the parts of a target's relative path.
   --format-regexp-flags
@@ -173,12 +173,12 @@ usage: npx test-turtle <command>
       Default: "u"
   --format-template
       The template string to format the parts of the target file.
-  --filter-regexp
-      Regular expression to indicate whether a file should be tested
-      when no layout file is present in the directory.
-      Default: "^[^.]"
-  --filter-regexp-flags
-      The flags to use for --filter-regexp.
+  --exclude-regexp
+      Regular expression to exclude files from testing when no ordering
+      file is present in the directory.
+      Default: "^\."
+  --exclude-regexp-flags
+      The flags to use for --exclude-regexp.
       Default: "u
   --no-memoization
       Disable memoization.
