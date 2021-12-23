@@ -1,6 +1,6 @@
 {
   "name": "test-turtle",
-  "version": "4.0.2",
+  "version": "5.0.0",
   "keywords": [
     "test",
     "runner",
@@ -10,9 +10,10 @@
   ],
   "scripts": {
     "lint": "npx eslint 'lib/*.mjs'",
-    "prettify": "npx prettier -w 'lib/*.mjs'",
+    "format": "npx prettier -w 'lib/*.mjs'",
     "test": "node lib/util.test.mjs && node lib/either.test.mjs && node lib/index.test.mjs && node lib/main.test.mjs && node lib/bin.test.mjs",
-    "turtle": "node lib/bin.mjs --layout alongside -- 'npx eslint $1 $2 && npx prettier -w $1 $2 && node $2 && npx c8 --check-coverage --branches 100 --functions 100 --include $1 -- node $2'"
+    "integration": "node lib/bin.mjs --test-var TEST --main-var MAIN --layout alongside -- /bin/sh -c 'echo $MAIN $TEST'",
+    "turtle": "node lib/bin.mjs --layout alongside -- /bin/sh -c 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'"
   },
   "files": ["/lib/*.mjs"],
   "main": "/lib/index.js",

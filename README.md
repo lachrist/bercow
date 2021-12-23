@@ -14,7 +14,7 @@ The problem that this package is trying to solve is avoiding to re-test files th
 
 ```
 npm install test-turtle
-npx test-turtle --target <target> --format <format> -- 'node $2'
+npx test-turtle --target <target> --format <format> -- /bin/sh -c 'node $TURTLE_TEST'
 ```
 
 - `target`: the directory to start collecting files.
@@ -34,13 +34,12 @@ Installation:
 git clone https://github.com/lachrist/test-turtle.git
 cd test-turtle
 npm i
-cd sample
 ```
 
 First run (everything is tested):
 
 ```sh
-node ../lib/bin.mjs 'npx c8 --include $1 -- node $2'
+node ./lib/bin.mjs --target sample --layout alongside -- /bin/sh -c 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'
 foo.js...
 ----------|---------|----------|---------|---------|-------------------
 File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
@@ -70,7 +69,7 @@ All files  |     100 |      100 |     100 |     100 |
 Second run (everything is memoized):
 
 ```sh
-node bin/bin.mjs --target sample 'npx c8 --include $1 -- node $2'
+node ./lib/bin.mjs --target sample -- /bin/sh -c 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'
 sample/foo.js...
 > Memoized
 sample/bar/index.js...
@@ -88,6 +87,7 @@ echo 'exports.getFoo = () => "f" + "oo";' > sample/foo.js
 Third run (`bar.js` is still memoized):
 
 ```sh
+node ./lib/bin.mjs --target sample -- /bin/sh -c 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'
 sample/foo.js...
 ----------|---------|----------|---------|---------|-------------------
 File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
@@ -143,13 +143,24 @@ Note that there is no ordering between `filename1` and `directory2`.
 ```
 usage: npx test-turtle <command>
   <command>
-      The command to execute for each test.
-      First argument: relative path of the target file.
-      Second argument: relative path of the test file.
-      Example: "npx c8 --include $1 -- node $2"
+      The file to execute for each test.
+      For instance: '/bin/sh'
+  --argv
+      The arguments to send to the executable file.
+      For instance:
+        - '-c'
+        - 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'
+  --main-var
+      The name of the environment variable that will hold the relative
+      path to the main file.
+      Default: 'TURTLE_MAIN'.
+  --test-var
+      The name of the environment variable that will hold the relative
+      path to the test file.
+      Default: 'TURTLE_TEST'.
   --stdio
       What to do with the command's stdio
-      Default: "inherit"
+      Default: 'inherit'
   --timeout
       The number of millisecond before sending SIGTERM to the command.
       One second later, SIGKILL will be send.
@@ -159,10 +170,10 @@ usage: npx test-turtle <command>
       Default: "."
   --layout-filename
       The name of the file indicating test layout.
-      Default: ".test.list"
+      Default: '.test.list'
   --memoization-path
       The path to the file for reading and writing memoization data.
-      Default: ".turtle.json"
+      Default: '.turtle.json'
   --layout
       Use a predefined layout: ["alongside","separated"].
       This option overrides the '--format' and '--exclude' options.
