@@ -1,39 +1,37 @@
 {
   "name": "test-turtle",
-  "version": "5.1.1",
+  "version": "6.0.0",
   "keywords": [
     "test",
     "runner",
-    "memoization",
-    "coverage",
-    "c8"
+    "memoization"
   ],
   "scripts": {
-    "lint": "npx eslint 'lib/*.mjs'",
-    "format": "npx prettier -w 'lib/*.mjs'",
+    "lint": "npx eslint 'lib/*.mjs' 'bin/*.mjs'",
+    "format": "npx prettier -w 'lib/*.mjs' 'bin/*.mjs'",
     "test": "node lib/util.test.mjs && node lib/either.test.mjs && node lib/index.test.mjs && node lib/main.test.mjs && node lib/bin.test.mjs",
     "integration": "node lib/bin.mjs --test-var TEST --main-var MAIN --layout alongside -- /bin/sh -c 'echo $MAIN $TEST'",
     "turtle": "node lib/bin.mjs --layout alongside -- /bin/sh -c 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'"
   },
   "files": [
-    "/lib/*.mjs"
+    "lib/*.mjs",
+    "bin/*.mjs"
   ],
-  "main": "/lib/index.js",
+  "main": "lib/index.js",
   "bin": {
-    "test-turtle": "/lib/bin.mjs"
+    "test-turtle": "lib/bin.mjs"
   },
   "devDependencies": {
-    "c8": "^7.10.0",
-    "chalk": "^4.1.2",
-    "eslint": "^8.5.0",
-    "prettier": "^2.5.1"
+    "c8": "^7.12.0",
+    "chalk": "^5.0.1",
+    "eslint": "^8.23.0",
+    "prettier": "^2.7.1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/lachrist/test-turtle.git"
   },
   "dependencies": {
-    "list-lang": "^0.1.0",
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.6"
   }
 }

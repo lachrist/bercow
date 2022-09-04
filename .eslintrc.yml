@@ -4,12 +4,9 @@ extends:
 env:
   es6: true
   node: true
-rules:
-  no-console:
-    - warn
-  no-unused-vars:
-    - error
-    - args: none
+# rules:
+#   no-console:
+#     - warn
 parserOptions:
   ecmaVersion: 2020
   sourceType: module
