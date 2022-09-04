@@ -7,8 +7,8 @@
     "memoization"
   ],
   "scripts": {
-    "lint": "npx eslint 'lib/*.mjs' 'bin/*.mjs'",
-    "format": "npx prettier -w 'lib/*.mjs' 'bin/*.mjs'",
+    "lint": "npx eslint test.mjs 'lib/*.mjs' 'bin/*.mjs'",
+    "format": "npx prettier -w test.mjs 'lib/*.mjs' 'bin/*.mjs'",
     "test": "node lib/util.test.mjs && node lib/either.test.mjs && node lib/index.test.mjs && node lib/main.test.mjs && node lib/bin.test.mjs",
     "integration": "node lib/bin.mjs --test-var TEST --main-var MAIN --layout alongside -- /bin/sh -c 'echo $MAIN $TEST'",
     "turtle": "node lib/bin.mjs --layout alongside -- /bin/sh -c 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'"

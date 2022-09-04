@@ -1,8 +1,7 @@
-
-import {readFile, writeFile} from "node:fs";
+import { readFile as readFileAsync, writeFile as writeFileAsync } from "node:fs/promises";
 import { ESLint } from "eslint";
-import { format } from "prettier";
-import {main, spawnSync} from "reborn/main.mjs";
+import { format as formatPrettier } from "prettier";
+import { mainAsync, spawnAsync } from "./lib/index.mjs";
 
 const eslint = new ESLint();
 
@@ -12,22 +11,23 @@ const mapTestFile = (path) => {
   return segments.join(".");
 };
 
-const formatAsync = (path) => {
-  const content = await readFile(path, "utf8");
+const formatAsync = async (path) => {
+  const content = await readFileAsync(path, "utf8");
   const formatted_content = formatPrettier(content);
   if (formatted_content !== content) {
-    await writeFile(path, formatted_content, "utf8");
+    await writeFileAsync(path, formatted_content, "utf8");
   }
 };
 
-main({
+const lintAsync = (paths) => eslint.lintFiles(paths);
+
+mainAsync({
   resources: (path) => [mapTestFile(path)],
-  acheiveAsync: await (path) => {
+  acheiveAsync: async (path) => {
     await formatAsync(path);
     await formatAsync(mapTestFile(path));
-    await eslint.lintFiles([path, mapTestFile(path)]);
+    await lintAsync([path, mapTestFile(path)]);
   },
-  progressAsync: (path) => {
-    spawnSync("node", getTestFile(path));
-  };
+  progressAsync: (path) =>
+    spawnAsync("npx", "c8", "--include", path, "--", "node", mapTestFile(path)),
 });
