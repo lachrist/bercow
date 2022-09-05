@@ -1,47 +1,44 @@
-
-import { ESLint } from "eslint";
-import {relative as toRelativePath} from "path";
+import { relative as toRelativePath } from "node:path";
+import { Buffer } from "node:buffer";
 import { default as Prettier } from "prettier";
-import { mainAsync, spawnAsync } from "./lib/index.mjs";
+import { ESLint } from "eslint";
+import { testTurtle as testTurtleAsync, spawnAsync } from "./lib/index.mjs";
 
-const {
-  format: formatPrettier,
-  resolveConfig: resolveConfigPrettier,
-} = Prettier;
+const { from: toBuffer } = Buffer;
+
+const { format: formatPrettier, resolveConfig: resolveConfigPrettier } =
+  Prettier;
 
 const eslint = new ESLint();
 let formatter = null;
 
-mainAsync({
-  resourcesAsync: async (path) => {
+testTurtleAsync({
+  link: async (path) => {
     const segments = path.split(".");
     segments.splice(-1, 0, "test");
-    return [
-      path,
-      segments.join("."),
-    ];
+    return [path, segments.join(".")];
   },
-  achieveAsync: async ({ path, content }) => {
+  lint: async ({ path, content }) => {
     let source = content.toString("utf8");
     source = formatPrettier(source, {
-      ... await resolveConfigPrettier(path),
+      ...(await resolveConfigPrettier(path)),
       filepath: path,
     });
-    const result = await eslint.lintText(source, { filePath: path });
+    const results = await eslint.lintText(source, { filePath: path });
     if (formatter === null) {
       formatter = await await eslint.loadFormatter("stylish");
     }
-    const message = await formatter.format(result);
+    const message = await formatter.format(results);
     if (message !== "") {
       console.log(message);
     }
-    if (result.errorCount > 0) {
+    if (results[0].errorCount > 0) {
       throw new Error("eslint failure");
     } else {
-      return Buffer.from(source, "utf8");
+      return toBuffer(source, "utf8");
     }
   },
-  progressAsync: async ([{path:main}, {path:test}]) =>
+  test: async ([{ path: main }, { path: test }]) =>
     await spawnAsync(
       "npx",
       "c8",
