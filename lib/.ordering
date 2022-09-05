@@ -2,5 +2,4 @@ util.mjs
 list.mjs
 hash.mjs
 spawn.mjs
-main.mjs
-bin.mjs
+index.mjs

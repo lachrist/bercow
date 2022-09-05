@@ -1,33 +1,55 @@
-import { readFile as readFileAsync, writeFile as writeFileAsync } from "node:fs/promises";
+
 import { ESLint } from "eslint";
-import { format as formatPrettier } from "prettier";
+import {relative as toRelativePath} from "path";
+import { default as Prettier } from "prettier";
 import { mainAsync, spawnAsync } from "./lib/index.mjs";
 
+const {
+  format: formatPrettier,
+  resolveConfig: resolveConfigPrettier,
+} = Prettier;
+
 const eslint = new ESLint();
-
-const mapTestFile = (path) => {
-  const segments = path.split(".");
-  segments.splice(segments.length - 1, "test");
-  return segments.join(".");
-};
-
-const formatAsync = async (path) => {
-  const content = await readFileAsync(path, "utf8");
-  const formatted_content = formatPrettier(content);
-  if (formatted_content !== content) {
-    await writeFileAsync(path, formatted_content, "utf8");
-  }
-};
-
-const lintAsync = (paths) => eslint.lintFiles(paths);
+let formatter = null;
 
 mainAsync({
-  resources: (path) => [mapTestFile(path)],
-  acheiveAsync: async (path) => {
-    await formatAsync(path);
-    await formatAsync(mapTestFile(path));
-    await lintAsync([path, mapTestFile(path)]);
+  resourcesAsync: async (path) => {
+    const segments = path.split(".");
+    segments.splice(-1, 0, "test");
+    return [
+      path,
+      segments.join("."),
+    ];
   },
-  progressAsync: (path) =>
-    spawnAsync("npx", "c8", "--include", path, "--", "node", mapTestFile(path)),
+  achieveAsync: async ({ path, content }) => {
+    let source = content.toString("utf8");
+    source = formatPrettier(source, {
+      ... await resolveConfigPrettier(path),
+      filepath: path,
+    });
+    const result = await eslint.lintText(source, { filePath: path });
+    if (formatter === null) {
+      formatter = await await eslint.loadFormatter("stylish");
+    }
+    const message = await formatter.format(result);
+    if (message !== "") {
+      console.log(message);
+    }
+    if (result.errorCount > 0) {
+      throw new Error("eslint failure");
+    } else {
+      return Buffer.from(source, "utf8");
+    }
+  },
+  progressAsync: async ([{path:main}, {path:test}]) =>
+    await spawnAsync(
+      "npx",
+      "c8",
+      "--100",
+      "--include",
+      toRelativePath(process.cwd(), main),
+      "--",
+      "node",
+      test,
+    ),
 });
