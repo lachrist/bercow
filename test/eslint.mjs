@@ -1,4 +1,4 @@
-import { default as Buffer } from "node:buffer";
+import { Buffer } from "node:buffer";
 import { writeSync as write } from "node:fs";
 import { ESLint } from "eslint";
 

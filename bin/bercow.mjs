@@ -1,8 +1,8 @@
 import { dirname as getDirectory, resolve as resolvePath } from "node:path";
 import { readFileSync as readFile, writeSync as write } from "node:fs";
+import { Buffer } from "node:buffer";
 import { load as parseYAML } from "js-yaml";
 import { bercow as bercowAsync } from "../lib/index.mjs";
-import { default as Buffer } from "node:buffer";
 
 const { from: toBuffer } = Buffer;
 const { parse: parseJSON } = JSON;
