@@ -1,4 +1,4 @@
-import { default as minimist } from "minimist";
+
 import { fileURLToPath } from "node:url";
 import {
   dirname as getDirectory,
@@ -10,24 +10,70 @@ const { isArray } = Array;
 
 const dirname = getDirectory(fileURLToPath(import.meta.url));
 
-let options = {
-  plugin: null,
-  ...minimist(process.argv.slice(2)),
+const argv = process.argv.slice(2);
+
+const getParser = (path) => {
+  if (path.endsWith(".json") {
+    return parseJSON;
+  } else {
+    return parseYAML;
+  }
 };
 
-if (options.plugin === null) {
-  console.log("usage: npx test-turtle --plugin ./path/to/plugin.mjs");
+if (argv.length > 2) {
+  console.log("usage: npx ghaik [config-file] [config-encoding]");
   process.exitCode = 1;
 } else {
-  const plugins = isArray(options.plugin) ? options.plugin : [options.plugin];
-  for (let plugin of plugins) {
-    if (plugin[0] === ".") {
-      plugin = toRelativePath(dirname, toAbsolutePath(process.cwd(), plugin));
-    }
-    options = {
-      ...options,
-      ...(await import(plugin)),
+  let [
+    config_file = ".ghaik.yml",
+    encoding = "utf8",
+  ] = argv;
+  config_file = resolvePath(process.cwd(), path);
+  const config_directory = getDirectory(config_file);
+  const {plugins, ...config} = getParser(path)(await readFileAsync(path, encoding));
+  const linkers = [];
+  const linters = [];
+  const testers = [];
+  for (const source of ownKeys(plugins)) {
+    const {default:plugin} = await import(
+      source[0] === "."
+        ? resolvePath(config_directory, source)
+        : source,
+    );
+    const {link, lint, test} = {
+      link: null,
+      lint: null,
+      test: null,
+      ... plugin(plugins[source]),
     };
+    if (link !== null) {
+      linkers.push(instance.link);
+    }
+    if (lint !== null) {
+      linters.push(instance.lint);
+    }
+    if (test !== null) {
+      testers.push(instance.test);
+    }
   }
-  await testTurtleAsync(options);
+  if (linkers.length === 0) {
+    throw new Error("Missing link");
+  } else if (linkers.length > 1) {
+  } else {
+    await testTurtleAsync({
+      ...config,
+      link: liners[0],
+      lint: linters.length === 1 ? linters[0] : async ({path, content}, ordering) => {
+        for (const lint of linters) {
+          content = lint({path, content}, ordering);
+        }
+        return content;
+      },
+      test: testers.length === 1 ? testers[0] : async (files, ordering) => {
+        for (const test of testers) {
+          await test(files, ordering);
+        }
+      },
+    });
+  }
 }

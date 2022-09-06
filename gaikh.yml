@@ -1,0 +1,7 @@
+
+plugins:
+  ghaik-link-adjacent: {}
+  ghaik-prettier: {}
+  ghaik-lint-import-order: {}
+  ghaik-eslint: {}
+  ghaik-c8: {}
