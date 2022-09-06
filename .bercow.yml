@@ -1,0 +1,7 @@
+
+plugins:
+  ./test/link-adjacent: {}
+  ./test/prettier: {}
+  ./test/lint-import-order: {}
+  ./test/eslint: {}
+  ./test/c8: {}

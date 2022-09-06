@@ -1,6 +1,6 @@
 {
-  "name": "test-turtle",
-  "version": "6.0.0",
+  "name": "bercow",
+  "version": "0.0.0",
   "keywords": [
     "test",
     "runner",
@@ -9,15 +9,15 @@
   "scripts": {
     "lint": "npx eslint 'lib/*.mjs' 'bin/*.mjs' 'test/*.mjs'",
     "format": "npx prettier -w 'lib/*.mjs' 'bin/*.mjs' 'test/*.mjs'",
-    "test": "node bin/test-turtle.mjs --plugin ./test/plugin.mjs"
+    "test": "node bin/bercow.mjs"
   },
   "files": [
     "lib/*.mjs",
-    "bin/*.mjs"
+    "bin/*.mjs",
   ],
   "main": "lib/index.js",
   "bin": {
-    "test-turtle": "lib/bin.mjs"
+    "bercow": "lib/bercow.mjs"
   },
   "devDependencies": {
     "c8": "^7.12.0",
@@ -28,5 +28,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/lachrist/test-turtle.git"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
   }
 }
