@@ -18,56 +18,16 @@ const getParser = (path) => {
 
 const isNotNull = (any) => any !== null;
 
-const linkNothing = (path, _ordering) => path;
-
-const lintNothing = ({ content }, _ordering) => content;
-
-const testNothing = (_files, _ordering) => {};
-
-const combineLink = (linkers) => async (path, progress) => {
-  const paths = [];
-  for (const link of linkers) {
-    paths.push(...(await link(path, progress)));
-  }
-  return paths;
-};
-
-const combineLint =
-  (linters) =>
-  async ({ path, content }, progress) => {
-    for (const lint of linters) {
-      content = await lint({ path, content }, progress);
-    }
-    return content;
-  };
-
-const combineTest = (testers) => async (files, progress) => {
-  for (const test of testers) {
-    await test(files, progress);
-  }
-};
-
-const compile = (maybe_closure_array, nothing, combine) => {
-  const closures = maybe_closure_array.filter(isNotNull);
-  if (closures.length === 0) {
-    return nothing;
-  } else if (closures.length === 1) {
-    return closures[0];
-  } else {
-    return combine(closures);
-  }
-};
-
 const argv = process.argv.slice(2);
 
 if (argv.length > 2) {
   write(
     1,
-    toBuffer("usage: npx ghaik [config-file] [config-encoding]", "utf8"),
+    toBuffer("usage: npx bercow [config-file] [config-encoding]", "utf8"),
   );
   process.exitCode = 1;
 } else {
-  const [config_relative_path = ".ghaik.yml", encoding = "utf8"] = argv;
+  const [config_relative_path = ".bercow.yml", encoding = "utf8"] = argv;
   const config_path = resolvePath(process.cwd(), config_relative_path);
   const home = getDirectory(config_path);
   const { plugins, ...config } = {
@@ -81,20 +41,23 @@ if (argv.length > 2) {
     const { default: plugin } = await import(
       source[0] === "." ? resolvePath(home, source) : source
     );
-    const instance = {
+    const { link, lint, test } = {
       link: null,
       lint: null,
       test: null,
-      ...plugin(plugins[source]),
+      ...(await plugin(plugins[source], home)),
     };
-    linkers.push(instance.link);
-    linters.push(instance.lint);
-    testers.push(instance.test);
+    linkers.push(link);
+    linters.push(lint);
+    testers.push(test);
   }
-  await bercowAsync({
-    ...config,
-    link: compile(linkers, linkNothing, combineLink),
-    lint: compile(linters, lintNothing, combineLint),
-    test: compile(testers, testNothing, combineTest),
-  });
+  await bercowAsync(
+    {
+      ...config,
+      link: compile(linkers, linkNothing, combineLink),
+      lint: compile(linters, lintNothing, combineLint),
+      test: compile(testers, testNothing, combineTest),
+    },
+    home,
+  );
 }

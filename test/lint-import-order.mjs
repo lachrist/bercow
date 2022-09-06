@@ -1,6 +1,6 @@
 import { resolve as resolvePath } from "node:path";
 import { parse as parseBabel } from "@babel/parser";
-import { generate as generateBabel } from "@babel/generator";
+import { default as generateBabel } from "@babel/generator";
 
 const NODE_SOURCE_RANKING = 1;
 const MODULE_SOURCE_RANKING = 2;
@@ -97,7 +97,7 @@ const isEqualShallowArray = (array1, array2) => {
   }
 };
 
-export default async (config) => {
+export default async (config, _home) => {
   config = { ...default_config, ...config };
   return {
     lint: async (file, ordering) => {

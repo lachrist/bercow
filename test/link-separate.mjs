@@ -5,7 +5,7 @@ const default_config = {
   "test-directory": "test",
 };
 
-export default async (config) => {
+export default async (config, _home) => {
   config = { ...default_config, ...config };
   return {
     link: async (path, _ordering) => [

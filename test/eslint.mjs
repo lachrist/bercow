@@ -4,7 +4,7 @@ import { ESLint } from "eslint";
 
 const { from: toBuffer } = Buffer;
 
-export default async (_config) => {
+export default async (_config, _home) => {
   const eslint = new ESLint();
   const formatter = await eslint.loadFormatter("stylish");
   return {

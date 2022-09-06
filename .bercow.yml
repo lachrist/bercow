@@ -1,7 +1,6 @@
 
 plugins:
-  ./test/link-adjacent: {}
-  ./test/prettier: {}
-  ./test/lint-import-order: {}
-  ./test/eslint: {}
-  ./test/c8: {}
+  ./test/link-adjacent.mjs: {}
+  ./test/prettier.mjs: {}
+  ./test/eslint.mjs: {}
+  ./test/c8.mjs: {}

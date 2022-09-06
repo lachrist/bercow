@@ -3,7 +3,7 @@ const default_config = {
   extension: null,
 };
 
-export default async (config) => {
+export default async (config, _home) => {
   config = { ...default_config, ...config };
   return {
     link: async (path, _ordering) => {

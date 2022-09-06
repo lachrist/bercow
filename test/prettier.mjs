@@ -7,7 +7,7 @@ const default_config = {
   "prettier-options": null,
 };
 
-export default async (config) => {
+export default async (config, _home) => {
   config = { ...default_config, ...config };
   return {
     lint: async ({ path, content }) =>

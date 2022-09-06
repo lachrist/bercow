@@ -6,7 +6,7 @@ const default_config = {
   "c8-argv": ["--100"],
 };
 
-export default async (config) => {
+export default async (config, _home) => {
   config = { ...default_config, ...config };
   return {
     test: async ([{ path: main }, { path: test }]) =>
