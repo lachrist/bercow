@@ -1,4 +1,4 @@
-import { spawnAsync } from "../lib/index.mjs";
+import { spawnAsync } from "./spawn.mjs";
 
 import { relative as toRelativePath } from "node:path";
 
@@ -6,17 +6,19 @@ const default_config = {
   "c8-argv": ["--100"],
 };
 
-export const test = async (config) => {
-  config = {...default_config, ...config};
-  return async ([{ path: main }, { path: test }]) =>
-    await spawnAsync(
-      "npx",
-      "c8",
-      ... config["c8-argv"],
-      "--include",
-      toRelativePath(process.cwd(), main),
-      "--",
-      "node",
-      test,
-    );
+export default async (config) => {
+  config = { ...default_config, ...config };
+  return {
+    test: async ([{ path: main }, { path: test }]) =>
+      await spawnAsync(
+        "npx",
+        "c8",
+        ...config["c8-argv"],
+        "--include",
+        toRelativePath(process.cwd(), main),
+        "--",
+        "node",
+        test,
+      ),
+  };
 };
