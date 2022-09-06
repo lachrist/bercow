@@ -7,8 +7,8 @@
     "memoization"
   ],
   "scripts": {
-    "lint": "npx eslint 'lib/*.mjs' 'bin/*.mjs' 'test/*.mjs'",
-    "format": "npx prettier -w 'lib/*.mjs' 'bin/*.mjs' 'test/*.mjs'",
+    "lint": "npx eslint 'lib/*.mjs' 'bin/*.mjs'",
+    "format": "npx prettier -w 'lib/*.mjs' 'bin/*.mjs'",
     "test": "node bin/bercow.mjs"
   },
   "files": [
@@ -21,19 +21,18 @@
     "bercow": "lib/bercow.mjs"
   },
   "devDependencies": {
-    "@babel/generator": "^7.19.0",
-    "@babel/parser": "^7.19.0",
+    "bercow-c8": "^0.0.1",
+    "bercow-eslint": "^0.0.0",
     "bercow-link-adjacent": "^0.0.0",
-    "c8": "^7.12.0",
-    "chalk": "^5.0.1",
-    "eslint": "^8.23.0",
-    "prettier": "^2.7.1"
+    "bercow-order-esm-import": "^0.0.0",
+    "bercow-prettier": "^0.0.1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lachrist/test-turtle.git"
+    "url": "https://github.com/lachrist/bercow.git"
   },
   "dependencies": {
+    "chalk": "^5.0.1",
     "js-yaml": "^4.1.0"
   }
 }

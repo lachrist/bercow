@@ -1,6 +1,7 @@
 
 plugins:
   bercow-link-adjacent: {}
-  ./test/prettier.mjs: {}
-  ./test/eslint.mjs: {}
-  ./test/c8.mjs: {}
+  bercow-order-esm-import: {}
+  bercow-prettier: {}
+  bercow-eslint: {}
+  bercow-c8: {}
