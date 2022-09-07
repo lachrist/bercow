@@ -1,2 +1,7 @@
+util.mjs
+log.mjs
+file.mjs
+cache.mjs
+plugin.mjs
 api.mjs
 cli.mjs
