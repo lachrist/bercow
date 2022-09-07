@@ -1,7 +1,9 @@
 util.mjs
 log.mjs
+hash.mjs
 file.mjs
 cache.mjs
 plugin.mjs
 api.mjs
+config.mjs
 cli.mjs
