@@ -16,7 +16,9 @@ const testAsync = async (content, options, infos) => {
     {
       index: 0,
       ordering: ["/home/main.mjs"],
-      log: (_message) => {},
+      logTitle: (_title) => {},
+      logSubtitle: (_subtitle) => {},
+      logParagraph: (_paragraph) => {},
       ...infos,
     },
   );

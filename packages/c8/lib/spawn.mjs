@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 
-const options = { stdio: "inherit" };
+const options = { stdio: "pipe" };
 
 // export const spawn = (command, ...argv) => {
 //   const { error = null, signal, status } = spawnSync(command, argv, options);
@@ -15,9 +15,13 @@ const options = { stdio: "inherit" };
 //   }
 // };
 
-export const spawnAsync = (command, ...argv) =>
+export const spawnAsync = (logParagraph, command, ...argv) =>
   new Promise((resolve, reject) => {
     const child = spawn(command, argv, options);
+    child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
+    child.stdout.on("data", logParagraph);
+    child.stderr.on("data", logParagraph);
     child.on("error", reject);
     child.on("exit", (status, signal) => {
       if (signal !== null) {

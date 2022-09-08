@@ -5,10 +5,20 @@ import { default as Chalk } from "chalk";
 
 const { from: toBuffer } = Buffer;
 
-export const log = (message) => {
+const { blue: chalkBlue, gray: chalkGray } = Chalk;
+
+const log = (message) => {
   write(1, toBuffer(message, "utf8"));
 };
 
-export const logColor = (message, color) => {
-  log(Chalk[color](message));
+export const logTitle = (title) => {
+  log(chalkBlue(`${title} ...\n`));
+};
+
+export const logSubtitle = (subtitle) => {
+  log(chalkBlue(`  > ${subtitle} ...\n`));
+};
+
+export const logParagraph = (paragraph) => {
+  log(chalkGray(paragraph));
 };

@@ -12,7 +12,7 @@ const { stringify: stringifyJSON } = JSON;
 
 const default_babel_parser_options = {
   sourceType: "module",
-  // allowAwaitOutsideFunction: true,
+  allowAwaitOutsideFunction: true,
 };
 
 const default_babel_generator_options = {
@@ -112,12 +112,9 @@ export default async (config, _home) => {
     ...config["babel-parser-options"],
   };
   return {
-    lint: async ({ path, content }, { log, ordering, index }) => {
-      log(
-        `  > ordering esm imports of ${relativizePath(
-          process.cwd(),
-          path,
-        )} ...\n`,
+    lint: async ({ path, content }, { logSubtitle, ordering, index }) => {
+      logSubtitle(
+        `ordering esm imports of ${relativizePath(process.cwd(), path)}`,
       );
       const { program } = parseBabel(content, babel_parser_options);
       const { head, body } = splitProgramBody(program.body);

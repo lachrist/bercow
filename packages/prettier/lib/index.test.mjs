@@ -7,7 +7,9 @@ import plugin from "./index.mjs";
 const infos = {
   index: 0,
   ordering: [],
-  log: (_message) => {},
+  logTitle: (_title) => {},
+  logSubtitle: (_subtitle) => {},
+  logParagraph: (_paragraph) => {},
 };
 
 const file = {

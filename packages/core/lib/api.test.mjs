@@ -41,15 +41,15 @@ const ordering = [
   const trace = [];
   await bercowAsync(
     {
-      link: (path, infos) => {
+      link: (path, { log: _log, ...infos }) => {
         trace.push({ type: "link", path, infos });
         return [path];
       },
-      lint: (file, infos) => {
+      lint: (file, { log: _log, ...infos }) => {
         trace.push({ type: "lint", file, infos });
         return file.content;
       },
-      test: (files, infos) => {
+      test: (files, { log: _log, ...infos }) => {
         trace.push({ type: "test", files, infos });
       },
     },

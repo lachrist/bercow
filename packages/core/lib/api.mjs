@@ -1,9 +1,6 @@
-import {
-  join as joinPath,
-  resolve as resolvePath,
-} from "node:path";
+import { join as joinPath, resolve as resolvePath } from "node:path";
 import { readFileSync as readFile, statSync as stat } from "node:fs";
-import { logColor } from "./log.mjs";
+import * as Log from "./log.mjs";
 import { makeHashing, hashChunkArray } from "./hash.mjs";
 import { loadFile, saveFile, cleanupFile, hashFile } from "./file.mjs";
 import {
@@ -15,8 +12,6 @@ import {
   closeCache,
 } from "./cache.mjs";
 import { linkNothing, lintNothing, testNothing } from "./plugin.mjs";
-
-const logBlue = (message) => logColor(message, "blue");
 
 const default_options = {
   link: linkNothing,
@@ -69,15 +64,13 @@ const lintAsync = async (path, infos, context) => {
 const testAsync = async (files, infos, context) => {
   const hash = hashChunkArray(files.map(hashFile), context.hashing);
   let step = context.iterator.next();
-  let memoized = step.value === hash;
-  if (!memoized) {
+  if (step.value !== hash) {
     while (!step.done) {
       step = context.iterator.next();
     }
     await context.test(files.map(cleanupFile), infos);
   }
   updateCache(context.test_cache, hash);
-  return memoized;
 };
 
 export const bercowAsync = async (options, home) => {
@@ -133,16 +126,12 @@ export const bercowAsync = async (options, home) => {
     const { length } = ordering;
     for (let index = 0; index < length; index += 1) {
       const path = ordering[index];
-      const infos = { index, ordering, log: logBlue };
+      const infos = { index, ordering, ...Log };
       const files = [];
       for (const link_path of await linkAsync(path, infos, context)) {
         files.push(await lintAsync(link_path, infos, context));
       }
-      if (await testAsync(files, infos, context)) {
-        logColor("Memoized\n", "blue");
-      } else {
-        logColor("Success\n", "green");
-      }
+      await testAsync(files, infos, context);
     }
   } finally {
     closeCache(lint_cache);

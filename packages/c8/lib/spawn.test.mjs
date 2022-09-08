@@ -1,8 +1,17 @@
 import { equal as assertEqual, rejects as assertReject } from "node:assert";
 import { spawnAsync } from "./spawn.mjs";
 
-assertEqual(await spawnAsync("/bin/sh", "-c", "exit 0"), undefined);
+const logParagraph = (_paragraph) => {};
 
-assertReject(async () => await spawnAsync("/bin/sh", "-c", "exit 1"));
+assertEqual(
+  await spawnAsync(logParagraph, "/bin/sh", "-c", "echo FOO"),
+  undefined,
+);
 
-assertReject(async () => await spawnAsync("/bin/sh", "-c", "kill $$"));
+assertReject(
+  async () => await spawnAsync(logParagraph, "/bin/sh", "-c", "exit 1"),
+);
+
+assertReject(
+  async () => await spawnAsync(logParagraph, "/bin/sh", "-c", "kill $$"),
+);

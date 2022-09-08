@@ -14,12 +14,9 @@ export default async (config, _home) => {
       ? await resolvePrettierConfigAsync(config["prettier-options"])
       : config["prettier-options"];
   return {
-    lint: async ({ path, content }, { log }) => {
-      log(
-        `  > formatting with prettier ${relativizePath(
-          process.cwd(),
-          path,
-        )} ...\n`,
+    lint: async ({ path, content }, { logSubtitle }) => {
+      logSubtitle(
+        `formatting with prettier ${relativizePath(process.cwd(), path)}`,
       );
       return formatPrettier(content, {
         ...(options === null
