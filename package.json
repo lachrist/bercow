@@ -5,9 +5,14 @@
   "scripts": {
     "lint": "npx eslint '**/*.mjs'",
     "format": "npx prettier -w '**/*.mjs'",
-    "test": "node packages/core/bin/bercow.mjs"
+    "test": "npx bercow"
   },
   "devDependencies": {
+    "@bercow/c8": "^0.0.0",
+    "@bercow/core": "^0.0.0",
+    "@bercow/eslint": "^0.0.0",
+    "@bercow/order-esm-import": "^0.0.0",
+    "@bercow/prettier": "^0.0.0",
     "eslint": "^8.23.0",
     "prettier": "^2.7.1"
   }

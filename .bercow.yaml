@@ -1,10 +1,10 @@
 plugins:
-  ./packages/link-adjacent/lib/index.mjs: {}
-  ./packages/order-esm-import/lib/index.mjs:
+  '@bercow/link-adjacent': {}
+  '@berco/worder-esm-import':
     fix: true
-  ./packages/prettier/lib/index.mjs:
+  '@bercow/prettier':
     prettier-options: .prettierrc.yml
-  ./packages/eslint/lib/index.mjs:
+  '@bercow/eslint':
     babel-parser-options:
       sourceType: module
-  ./packages/c8/lib/index.mjs: {}
+  '@bercow/c8': {}

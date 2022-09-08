@@ -1,9 +1,6 @@
 {
   "name": "@bercow/c8",
-  "version": "0.0.0",
-  "files": [
-    "lib/*.mjs"
-  ],
+  "version": "0.0.1",
   "main": "lib/index.mjs",
   "dependencies": {
     "c8": "^7.12.0"

@@ -1,13 +1,9 @@
 {
   "name": "@bercow/core",
-  "version": "0.0.0",
-  "files": [
-    "lib/*.mjs",
-    "bin/*.mjs"
-  ],
+  "version": "0.0.1",
   "main": "lib/api.js",
   "bin": {
-    "bercow": "lib/bercow.mjs"
+    "bercow": "bin/bercow.mjs"
   },
   "dependencies": {
     "chalk": "^5.0.1",

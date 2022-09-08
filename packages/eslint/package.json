@@ -1,14 +1,10 @@
 {
   "name": "@bercow/eslint",
-  "version": "0.0.0",
-  "files": [
-    "lib/*.mjs"
-  ],
+  "version": "0.0.1",
   "main": "lib/index.mjs",
   "dependencies": {
     "eslint": "^8.23.0"
   },
-
   "repository": {
     "type": "git",
     "url": "https://github.com/lachrist/bercow.git",
