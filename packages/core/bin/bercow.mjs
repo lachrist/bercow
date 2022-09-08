@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { runBercowAsync } from "../lib/cli.mjs";
 
 Error.stackTraceLimit = Infinity;
