@@ -1,6 +1,6 @@
 plugins:
   '@bercow/link-adjacent': {}
-  '@berco/worder-esm-import':
+  '@bercow/order-esm-import':
     fix: true
   '@bercow/prettier':
     prettier-options: .prettierrc.yml

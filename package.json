@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@bercow/c8": "^0.0.1",
-    "@bercow/core": "^0.0.1",
+    "@bercow/core": "^0.0.2",
     "@bercow/eslint": "^0.0.1",
     "@bercow/order-esm-import": "^0.0.1",
     "@bercow/prettier": "^0.0.1",
