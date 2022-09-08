@@ -1,7 +1,9 @@
 
 plugins:
   bercow-link-adjacent: {}
-  # bercow-order-esm-import: {}
-  bercow-prettier: {}
+  bercow-order-esm-import:
+    fix: true
+  bercow-prettier:
+    prettier-options: .prettierrc.yml
   bercow-eslint: {}
   bercow-c8: {}
