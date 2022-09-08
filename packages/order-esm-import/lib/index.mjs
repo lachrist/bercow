@@ -1,4 +1,8 @@
-import { resolve as resolvePath, dirname as getDirectory, relative as relativizePath } from "node:path";
+import {
+  resolve as resolvePath,
+  dirname as getDirectory,
+  relative as relativizePath,
+} from "node:path";
 import { parse as parseBabel } from "@babel/parser";
 import BabelGenerator from "@babel/generator";
 
@@ -108,8 +112,13 @@ export default async (config, _home) => {
     ...config["babel-parser-options"],
   };
   return {
-    lint: async ({ path, content }, {log, ordering, index}) => {
-      log(`  > ordering esm imports of ${relativizePath(process.cwd(), path)} ...\n`);
+    lint: async ({ path, content }, { log, ordering, index }) => {
+      log(
+        `  > ordering esm imports of ${relativizePath(
+          process.cwd(),
+          path,
+        )} ...\n`,
+      );
       const { program } = parseBabel(content, babel_parser_options);
       const { head, body } = splitProgramBody(program.body);
       const base = getDirectory(path);

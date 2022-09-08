@@ -15,13 +15,18 @@ export default async (config, _home) => {
       : config["prettier-options"];
   return {
     lint: async ({ path, content }, { log }) => {
-      log(`  > formatting with prettier ${relativizePath(process.cwd(), path)} ...\n`);
+      log(
+        `  > formatting with prettier ${relativizePath(
+          process.cwd(),
+          path,
+        )} ...\n`,
+      );
       return formatPrettier(content, {
         ...(options === null
           ? await resolvePrettierConfigAsync(path)
           : options),
         filepath: path,
-      }),
-    }
+      });
+    },
   };
 };

@@ -1,4 +1,4 @@
-import { join as joinPath, relative as toRelativePath } from "node:path";
+import { join as joinPath, relative as relativizePath } from "node:path";
 
 export default async (config, home) => {
   config = {
@@ -14,9 +14,9 @@ export default async (config, home) => {
         joinPath(
           config["home-directory"],
           config["test-directory"],
-          toRelativePath(config["home-directory"], path),
+          relativizePath(config["home-directory"], path),
         ),
       ];
-    }
+    },
   };
 };

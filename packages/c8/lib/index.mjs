@@ -10,7 +10,7 @@ export default async (config, _home) => {
     ...config,
   };
   return {
-    test: async ([{ path: main }, { path: test }], {log}) => {
+    test: async ([{ path: main }, { path: test }], { log }) => {
       log(`  > testing with c8 ${relativizePath(process.cwd(), main)} ...\n`);
       await spawnAsync(
         "npx",

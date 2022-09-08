@@ -1,7 +1,6 @@
 import {
   join as joinPath,
   resolve as resolvePath,
-  relative as relativizePath,
 } from "node:path";
 import { readFileSync as readFile, statSync as stat } from "node:fs";
 import { logColor } from "./log.mjs";
