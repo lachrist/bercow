@@ -1,6 +1,6 @@
 {
   "name": "@bercow/prettier",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "files": [
     "lib/*.mjs"
   ],
@@ -9,7 +9,7 @@
     "eslint": "^8.23.0"
   },
   "peerDependencies": {
-    "@bercow/core": "1"
+    "@bercow/core": "^0.0.0"
   },
   "repository": {
     "type": "git",

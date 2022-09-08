@@ -1,6 +1,6 @@
 {
   "name": "@bercow/c8",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "files": [
     "lib/*.mjs"
   ],
@@ -9,7 +9,7 @@
     "c8": "^7.12.0"
   },
   "peerDependencies": {
-    "@bercow/core": "1"
+    "@bercow/core": "^0.0.0"
   },
   "repository": {
     "type": "git",
