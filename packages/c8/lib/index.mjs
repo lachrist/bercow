@@ -8,7 +8,10 @@ export default async (config, _home) => {
     ...config,
   };
   return {
-    test: async ([{ path: main }, { path: test }], { logSubtitle, logParagraph }) => {
+    test: async (
+      [{ path: main }, { path: test }],
+      { logSubtitle, logParagraph },
+    ) => {
       logSubtitle(`testing with c8 ${relativizePath(process.cwd(), main)}`);
       await spawnAsync(
         logParagraph,
