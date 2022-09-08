@@ -1,0 +1,24 @@
+{
+  "name": "@bercow/link-separate",
+  "version": "1.0.0",
+  "files": [
+    "lib/*.mjs"
+  ],
+  "main": "lib/index.mjs",
+  "dependencies": {
+    "eslint": "^8.23.0"
+  },
+  "peerDependencies": {
+    "@bercow/core": "1",
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lachrist/bercow.git",
+    "directory": "packages/link-separate"
+  },
+  "keywords": [
+    "bercow",
+    "plugin",
+    "link",
+  ]
+}

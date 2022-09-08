@@ -1,38 +1,10 @@
 {
-  "name": "@bercow/core",
-  "version": "0.0.0",
-  "keywords": [
-    "test",
-    "runner",
-    "memoization"
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "lint": "npx eslint 'lib/*.mjs' 'bin/*.mjs'",
-    "format": "npx prettier -w 'lib/*.mjs' 'bin/*.mjs'",
-    "test": "node bin/bercow.mjs"
-  },
-  "files": [
-    "lib/api.mjs",
-    "lib/cli.mjs",
-    "bin/bercow.mjs"
-  ],
-  "main": "lib/api.js",
-  "bin": {
-    "bercow": "lib/bercow.mjs"
-  },
-  "devDependencies": {
-    "bercow-c8": "^0.0.1",
-    "bercow-eslint": "^0.0.0",
-    "bercow-link-adjacent": "^0.0.0",
-    "bercow-order-esm-import": "^0.1.1",
-    "bercow-prettier": "^0.0.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lachrist/bercow.git"
-  },
-  "dependencies": {
-    "chalk": "^5.0.1",
-    "js-yaml": "^4.1.0"
+    "lint": "npx eslint '**/*.mjs'",
+    "format": "npx prettier -w '**/*.mjs'",
+    "test": "node packages/core/bin/bercow.mjs"
   }
 }

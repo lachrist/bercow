@@ -1,9 +1,8 @@
-
 plugins:
-  bercow-link-adjacent: {}
-  bercow-order-esm-import:
+  ./packages/link-adjacent/lib/index.mjs: {}
+  ./packages/order-esm-import/lib/index.mjs:
     fix: true
-  bercow-prettier:
+  ./packages/prettier/lib/index.mjs:
     prettier-options: .prettierrc.yml
-  bercow-eslint: {}
-  bercow-c8: {}
+  ./packages/eslint/lib/index.mjs: {}
+  ./packages/bercow/lib/index.mjs: {}

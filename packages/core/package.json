@@ -1,0 +1,27 @@
+{
+  "name": "@bercow/core",
+  "version": "1.0.0",
+  "files": [
+    "lib/*.mjs",
+    "bin/*.mjs"
+  ],
+  "main": "lib/api.js",
+  "bin": {
+    "bercow": "lib/bercow.mjs"
+  },
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "js-yaml": "^4.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lachrist/bercow.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "test",
+    "runner",
+    "memoization",
+    "ordering"
+  ]
+}
