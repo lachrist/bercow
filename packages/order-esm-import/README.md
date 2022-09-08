@@ -1,4 +1,4 @@
-# bercow-import-esm-order
+# @bercow/import-esm-order
 
 Lint plugin for the [bercow](https://github.com/lachrist/bercow) test runner based which enforces import ordering on native modules. Node modules should be first, then external modules, then internal modules. The ordering of internal module follows bercow's ordering. Throws an error if an internal module is imported without being tested first.
 

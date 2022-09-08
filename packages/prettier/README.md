@@ -1,4 +1,4 @@
-# bercow-prettier
+# @bercow/prettier
 
 Lint plugin for the [bercow](https://github.com/lachrist/bercow) test runner based on [prettier](https://github.com/prettier/prettier).
 

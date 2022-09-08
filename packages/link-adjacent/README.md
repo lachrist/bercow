@@ -1,4 +1,4 @@
-# bercow-link-adjacent
+# @bercow/link-adjacent
 
 Link plugin for the [bercow](https://github.com/lachrist/bercow) test runner which links a test file to its main file. This plugin works for projects whose test files sit next to their main file with an additional extension.
 
