@@ -1,4 +1,4 @@
-import {equal as assertEqual} from "node:assert";
+import { equal as assertEqual } from "node:assert";
 import {
   writeFile as writeFileAsync,
   mkdir as mkdirAsync,
@@ -7,6 +7,12 @@ import {
 import { tmpdir as getTmpdir } from "node:os";
 import { join as joinPath } from "node:path";
 import plugin from "./index.mjs";
+
+const infos = {
+  index: 0,
+  ordering: [],
+  log: (_message) => {},
+};
 
 const home = joinPath(
   getTmpdir(),
@@ -39,9 +45,9 @@ assertEqual(
         content: "bar",
       },
     ],
-    [],
+    infos,
   ),
   undefined,
 );
 
-// await rmAsync(home, { recursive: true });
+await rmAsync(home, { recursive: true });

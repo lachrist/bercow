@@ -1,6 +1,5 @@
-
 import { join as joinPath } from "node:path";
-import {tmpdir as getTmpdir} from "node:os";
+import { tmpdir as getTmpdir } from "node:os";
 export {
   equal as assertEqual,
   deepEqual as assertDeepEqual,
@@ -11,7 +10,8 @@ export {
 const { now } = Date;
 const { random } = Math;
 
-export const getTemporaryPath = () => joinPath(
-  getTmpdir(),
-  `test_turtle_${now().toString(36)}_${random().toString(36).slice(2)}`,
-);
+export const getTemporaryPath = () =>
+  joinPath(
+    getTmpdir(),
+    `test_turtle_${now().toString(36)}_${random().toString(36).slice(2)}`,
+  );

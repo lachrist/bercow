@@ -4,6 +4,12 @@ import { equal as assertEqual } from "node:assert";
 import { join as joinPath } from "node:path";
 import plugin from "./index.mjs";
 
+const infos = {
+  index: 0,
+  ordering: [],
+  log: (_message) => {},
+};
+
 const file = {
   path: joinPath(process.cwd(), "file.mjs"),
   content: "{ 123; }",
@@ -14,12 +20,12 @@ const file = {
     { "prettier-options": { tabWidth: 0 } },
     "/home",
   );
-  assertEqual(await lint(file, []), "{\n123;\n}\n");
+  assertEqual(await lint(file, infos), "{\n123;\n}\n");
 }
 
 {
   const { lint } = await plugin({}, "/home");
-  assertEqual(await lint(file, []), "{\n  123;\n}\n");
+  assertEqual(await lint(file, infos), "{\n  123;\n}\n");
 }
 
 {
@@ -27,5 +33,5 @@ const file = {
     { "prettier-options": "prettierrc.yaml" },
     process.cwd(),
   );
-  assertEqual(await lint(file, []), "{\n  123;\n}\n");
+  assertEqual(await lint(file, infos), "{\n  123;\n}\n");
 }

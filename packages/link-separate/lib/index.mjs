@@ -7,13 +7,16 @@ export default async (config, home) => {
     ...config,
   };
   return {
-    link: async (path, _ordering) => [
-      path,
-      joinPath(
-        config["home-directory"],
-        config["test-directory"],
-        toRelativePath(config["home-directory"], path),
-      ),
-    ],
+    link: async (path, { log }) => {
+      log(`${relativizePath(process.cwd(), path)} ...\n`);
+      return [
+        path,
+        joinPath(
+          config["home-directory"],
+          config["test-directory"],
+          toRelativePath(config["home-directory"], path),
+        ),
+      ];
+    }
   };
 };

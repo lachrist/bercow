@@ -1,10 +1,9 @@
 import {
   equal as assertEqual,
   rejects as assertReject,
-  doesNotReject as assertResolve,
 } from "node:assert/strict";
-import plugin from "./index.mjs";
 import { format as formatPrettier } from "prettier";
+import plugin from "./index.mjs";
 
 const testAsync = async (content, options, infos) => {
   const { lint } = await plugin(options, "/home");
@@ -13,9 +12,11 @@ const testAsync = async (content, options, infos) => {
       path: "/home/main.mjs",
       content,
     },
+
     {
       index: 0,
       ordering: ["/home/main.mjs"],
+      log: (_message) => {},
       ...infos,
     },
   );
@@ -34,6 +35,7 @@ await assertReject(
     {},
     { index: 0, ordering: ["/home/main.mjs", "/home/dep.mjs"] },
   ),
+
   /^Error: File should not be imported before being tested/u,
 );
 
@@ -47,6 +49,7 @@ await assertReject(
       ordering: ["/home/dep1.mjs", "/home/dep2.mjs", "/home/main.mjs"],
     },
   ),
+
   /^Error: Ordering mismatch/,
 );
 
@@ -57,6 +60,7 @@ await assertReject(
     { fix: false },
     { index: 2, ordering: ["/home/dep.mjs", "/home/main.mjs"] },
   ),
+
   /^Error: Ordering mismatch/,
 );
 
@@ -66,12 +70,13 @@ await assertReject(
   assertEqual(
     await testAsync(
       content,
-      {fix: false},
+      { fix: false },
       {
         index: 2,
         ordering: ["/home/dep.mjs", "/home/main.mjs"],
       },
     ),
+
     content,
   );
 }
@@ -82,12 +87,13 @@ await assertReject(
   assertEqual(
     await testAsync(
       content,
-      {fix: true},
+      { fix: true },
       {
         index: 2,
         ordering: ["/home/dep.mjs", "/home/main.mjs"],
       },
     ),
+
     content,
   );
 }
@@ -95,14 +101,21 @@ await assertReject(
 // fix >> change //
 {
   assertEqual(
-    formatPrettier(await testAsync(
-      `import "./dep.mjs"; import "package";`,
-      {fix: true},
-      {
-        index: 2,
-        ordering: ["/home/dep.mjs", "/home/main.mjs"],
-      },
-    ), {filepath:"/home/main.mjs"}),
-    formatPrettier(`import "package"; import "./dep.mjs";`, {filepath:"/home/main.mjs"}),
+    formatPrettier(
+      await testAsync(
+        `import "./dep.mjs"; import "package";`,
+        { fix: true },
+        {
+          index: 2,
+          ordering: ["/home/dep.mjs", "/home/main.mjs"],
+        },
+      ),
+
+      { filepath: "/home/main.mjs" },
+    ),
+
+    formatPrettier(`import "package"; import "./dep.mjs";`, {
+      filepath: "/home/main.mjs",
+    }),
   );
 }

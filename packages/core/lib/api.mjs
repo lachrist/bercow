@@ -17,6 +17,8 @@ import {
 } from "./cache.mjs";
 import { linkNothing, lintNothing, testNothing } from "./plugin.mjs";
 
+const logBlue = (message) => logColor(message, "blue");
+
 const default_options = {
   link: linkNothing,
   lint: lintNothing,
@@ -132,8 +134,7 @@ export const bercowAsync = async (options, home) => {
     const { length } = ordering;
     for (let index = 0; index < length; index += 1) {
       const path = ordering[index];
-      const infos = { index, ordering };
-      logColor(`${relativizePath(process.cwd(), path)} ...${"\n"}`, "blue");
+      const infos = { index, ordering, log: logBlue };
       const files = [];
       for (const link_path of await linkAsync(path, infos, context)) {
         files.push(await lintAsync(link_path, infos, context));

@@ -9,7 +9,7 @@
     "c8": "^7.12.0"
   },
   "peerDependencies": {
-    "@bercow/core": "1",
+    "@bercow/core": "1"
   },
   "repository": {
     "type": "git",

@@ -6,5 +6,9 @@
     "lint": "npx eslint '**/*.mjs'",
     "format": "npx prettier -w '**/*.mjs'",
     "test": "node packages/core/bin/bercow.mjs"
+  },
+  "devDependencies": {
+    "eslint": "^8.23.0",
+    "prettier": "^2.7.1"
   }
 }

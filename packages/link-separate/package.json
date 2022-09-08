@@ -9,7 +9,7 @@
     "eslint": "^8.23.0"
   },
   "peerDependencies": {
-    "@bercow/core": "1",
+    "@bercow/core": "1"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,6 @@
   "keywords": [
     "bercow",
     "plugin",
-    "link",
+    "link"
   ]
 }

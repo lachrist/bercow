@@ -4,6 +4,12 @@ import { equal as assertEqual, rejects as assertReject } from "node:assert";
 import { join as joinPath } from "node:path";
 import plugin from "./index.mjs";
 
+const infos = {
+  index: 0,
+  ordering: [],
+  log: (_message) => {},
+};
+
 const { lint } = await plugin({}, process.cwd());
 
 await assertReject(
@@ -12,7 +18,7 @@ await assertReject(
       path: joinPath(process.cwd(), "file.mjs"),
       content: "missing_global;",
     },
-    [],
+    infos,
   ),
 );
 
@@ -22,7 +28,7 @@ assertEqual(
       path: joinPath(process.cwd(), "file.mjs"),
       content: "123;",
     },
-    [],
+    infos,
   ),
   "123;",
 );

@@ -1,4 +1,4 @@
-import { resolve as resolvePath, dirname as getDirectory } from "node:path";
+import { resolve as resolvePath, dirname as getDirectory, relative as relativizePath } from "node:path";
 import { parse as parseBabel } from "@babel/parser";
 import BabelGenerator from "@babel/generator";
 
@@ -8,6 +8,7 @@ const { stringify: stringifyJSON } = JSON;
 
 const default_babel_parser_options = {
   sourceType: "module",
+  // allowAwaitOutsideFunction: true,
 };
 
 const default_babel_generator_options = {
@@ -24,7 +25,7 @@ const isImport = (statement) =>
   (statement.type === "ExportNamedDeclaration" && statement.source !== null) ||
   statement.type === "ExportAllDeclaration";
 
-const orderImportStatement = (statement, base, { ordering, index }) => {
+const orderImportStatement = (statement, base, ordering, index) => {
   const {
     source: { value: source },
   } = statement;
@@ -86,7 +87,7 @@ const isEqualShallowArray = (array1, array2) => {
 
 const getStatement = ({ statement }) => statement;
 
-const removeLocation = ({loc, ...rest}) => rest;
+const removeLocation = ({ loc: _loc, ...rest }) => rest;
 
 const compareOrderedStatement = ({ order: order1 }, { order: order2 }) =>
   order1 - order2;
@@ -107,15 +108,13 @@ export default async (config, _home) => {
     ...config["babel-parser-options"],
   };
   return {
-    lint: async ({ path, content }, infos) => {
-      const { program } = parseBabel(content, {
-        sourceFilename: path,
-        ...babel_parser_options,
-      });
+    lint: async ({ path, content }, {log, ordering, index}) => {
+      log(`  > ordering esm imports of ${relativizePath(process.cwd(), path)} ...\n`);
+      const { program } = parseBabel(content, babel_parser_options);
       const { head, body } = splitProgramBody(program.body);
       const base = getDirectory(path);
       const ordered_head = head.map((statement) =>
-        orderImportStatement(statement, base, infos),
+        orderImportStatement(statement, base, ordering, index),
       );
       if (config.fix) {
         const sorted_ordered_head = ordered_head.slice();

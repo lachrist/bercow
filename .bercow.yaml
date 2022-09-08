@@ -4,5 +4,7 @@ plugins:
     fix: true
   ./packages/prettier/lib/index.mjs:
     prettier-options: .prettierrc.yml
-  ./packages/eslint/lib/index.mjs: {}
-  ./packages/bercow/lib/index.mjs: {}
+  ./packages/eslint/lib/index.mjs:
+    babel-parser-options:
+      sourceType: module
+  ./packages/c8/lib/index.mjs: {}

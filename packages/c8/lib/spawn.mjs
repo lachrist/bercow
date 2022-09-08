@@ -17,7 +17,6 @@ const options = { stdio: "inherit" };
 
 export const spawnAsync = (command, ...argv) =>
   new Promise((resolve, reject) => {
-    console.log(command, argv.join(" "));
     const child = spawn(command, argv, options);
     child.on("error", reject);
     child.on("exit", (status, signal) => {
