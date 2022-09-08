@@ -1,198 +1,65 @@
-# test-turtle
+# bercow
 
-This package a simple language-agnostic test runner which uses memoization based on file dependency information provided by the user.
-The problem that this package is trying to solve is avoiding to re-test files that are known to be unaffected by a change.
+A test runner with a plugin system that has a *strong* emphasis on running tests in order. When developing an application, I found out that I was always running my test files in the same order: from lower-level modules to higher-level modules. This test runner requires you to describe the order in which you want to test your application files with `.ordering` file in each directory. It makes use of cache for performance. Basically, code a bit and always run `npx bercow` to format, lint and test your application from bottom up. Which is nice because you do not need to remember multiple commands nor which files you changed.
 
-## Requirements
+## Example
 
-1. *Test File Mapping*: Each file to be tested should have a dedicated test file whose path can be computed based on the path of the file it is testing. The user have to provide a regular expression and a template to compute a the path of the test file from any given target file. For instance, if `lib/foo.mjs` is tested by `test/foo.mjs`, then the regular expression `/^lib/(.*)$/` with the template `test/$1` should be provided.
-2. *No cyclic dependencies:* This package relies on a partial ordering between files where any given file can only import files which are below itself. Cycles between file imports renders this impossible.
-3. *Single directory:* This package does not visit directories multiple times. Hence the directory layout must be reflected by the ordering. For instance the imports `foo < lib/bar < qux` are fine. But the imports `foo < lib/bar < qux < lib/buz` cannot be handled by this package.
-4. *Ordering files:* Every directory (deeply) containing files to test should contain a file (named `.test.list` by  default) which provide a partial ordering of the elements of the directory.
+This repository :)
 
-## Getting Started
+## Plugins
 
-```
-npm install test-turtle
-npx test-turtle --target <target> --format <format> -- /bin/sh -c 'node $TURTLE_TEST'
-```
+Bercow requires plugins to run. Currently there are only plugins for node applications but bercow is language agnostic.
 
-- `target`: the directory to start collecting files.
-- `format`: specify how to fetch test files.
-  - `"separated"`: the test files are located in the dedicated `test/` directory which mirrors the `lib/` directory.
-  - `"alongside"`: the test files are located alongside the file they are testing with an additional `.test` extension -- eg: `foo.js` and `foo.test.js`.
+Linkers: return the test file associated to an application file
+- [link-separate](packages/link-separate)
+- [link-adjacent](packages/link-adjacent)
 
-**Warning**
-By default all files are considered to be independent from each others.
-Specifying dependencies requires the presence of ordering files.
+Linters: format/lint application files and test files
+- [prettier](packages/prettier)
+- [eslint](packages/eslint)
+- [order-esm-import](packages/order-esm-import)
 
-## Demonstration
+Testers: run the test file
+- [c8](packages/c8)
 
-Installation:
+## Common Options
 
-```sh
-git clone https://github.com/lachrist/test-turtle.git
-cd test-turtle
-npm i
-```
+* `plugins <Object>` Mapping from plugin name/path to plugin options. *Default* `{}`, `bercow` will not do anything.
+* `target-directory <string>` Where to start looking for files to test. *Default* `"."`.
+* `ordering-filename <string>` Name of the files containing the ordering. *Default* `".ordering"`.
+* `lint-cache-file <string>` Path of the lint cache. *Default* `"tmp/bercow-lint.txt"`.
+* `test-cache-file <string>` Path of the test cache. *Default* `"tmp/bercow-test.txt"`.
+* `clean <boolean>` Clear caches before running. *Default* `false`.
+* `encoding <string>` Charset encoding to use for all the files. *Default* `"utf8"`.
 
-First run (everything is tested):
+<!--
 
-```sh
-node ./lib/bin.mjs --target sample --layout alongside -- /bin/sh -c 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'
-foo.js...
-----------|---------|----------|---------|---------|-------------------
-File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
-----------|---------|----------|---------|---------|-------------------
-All files |     100 |      100 |     100 |     100 |                   
- foo.js   |     100 |      100 |     100 |     100 |                   
-----------|---------|----------|---------|---------|-------------------
-> Success
-bar/index.js...
-----------|---------|----------|---------|---------|-------------------
-File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
-----------|---------|----------|---------|---------|-------------------
-All files |     100 |      100 |     100 |     100 |                   
- index.js |     100 |      100 |     100 |     100 |                   
-----------|---------|----------|---------|---------|-------------------
-> Success
-foobar.js...
------------|---------|----------|---------|---------|-------------------
-File       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
------------|---------|----------|---------|---------|-------------------
-All files  |     100 |      100 |     100 |     100 |                   
- foobar.js |     100 |      100 |     100 |     100 |                   
------------|---------|----------|---------|---------|-------------------
-> Success
-```
+## Plugins
 
-Second run (everything is memoized):
+* `plugin = await (await import("plugin")).default(options, home)`
+  * `options <any>` The plugin's options
+  * `home <string>` The path of the configuration file
 
-```sh
-node ./lib/bin.mjs --target sample -- /bin/sh -c 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'
-sample/foo.js...
-> Memoized
-sample/bar/index.js...
-> Memoized
-sample/foobar.js...
-> Memoized
-```
+* `plugin`
+  * `link(path, infos)`
+    * `path <string>` The current file.
+    * `infos <Infos>`
+  * `lint(file, infos)`
+    * `file <File>`
+    * `infos <Infos>`
+  * `plugin.test(files, infos)`
+    * `files <File[]>`
+    * `infos <Infos>`
 
-Modifying `sample/foo.js`:
+* `File`
+  * `path <string>`
+  * `content <string>`
 
-```sh
-echo 'exports.getFoo = () => "f" + "oo";' > sample/foo.js
-```
+* `Infos`
+  * `ordering <string[]>` The entire file ordering of the application.
+  * `index <number>` The current position in the file ordering.
+  * `logTitle(title)` Log a blue title.
+  * `logSubtitle(subtitle)` Log an indented blue title.
+  * `logParagraph(paragraph)` Log a gray out paragraph.
 
-Third run (`bar.js` is still memoized):
-
-```sh
-node ./lib/bin.mjs --target sample -- /bin/sh -c 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'
-sample/foo.js...
-----------|---------|----------|---------|---------|-------------------
-File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
-----------|---------|----------|---------|---------|-------------------
-All files |     100 |      100 |     100 |     100 |                   
- foo.js   |     100 |      100 |     100 |     100 |                   
-----------|---------|----------|---------|---------|-------------------
-> Success
-sample/bar/index.js...
-> Memoized
-sample/foobar.js...
------------|---------|----------|---------|---------|-------------------
-File       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
------------|---------|----------|---------|---------|-------------------
-All files  |     100 |      100 |     100 |     100 |                   
- foobar.js |     100 |      100 |     100 |     100 |                   
------------|---------|----------|---------|---------|-------------------
-> Success
-```
-
-## Ordering Files
-
-Each directory containing files to test should contain an ordering file.
-This file is in text format and contain nested lists whose elements are the name of the elements (files and directories) of the directory.
-Each directory should be terminated by `/` character.
-There exists two kinds of lists: ordered lists which are marked with a `-` character and unordered lists which are marked with a `*` character.
-
-Example of a configuration file:
-
-```txt
-- directory1/
-- * filename1
-  * directory2/
-- filename2
-```
-
-The package deduce the following partial ordering:
-
-```txt
-directory1 < filename1
-directory1 < directory2
-directory1 < filename2
-
-filename1 < filename2
-
-directory2 < filename2
-```
-
-Note that there is no ordering between `filename1` and `directory2`.
-
-## CLI
-
-```
-usage: npx test-turtle <command>
-  <command>
-      The file to execute for each test.
-      For instance: '/bin/sh'
-  --argv
-      The arguments to send to the executable file.
-      For instance:
-        - '-c'
-        - 'npx c8 --include $TURTLE_MAIN -- node $TURTLE_TEST'
-  --main-var
-      The name of the environment variable that will hold the relative
-      path to the main file.
-      Default: 'TURTLE_MAIN'.
-  --test-var
-      The name of the environment variable that will hold the relative
-      path to the test file.
-      Default: 'TURTLE_TEST'.
-  --stdio
-      What to do with the command's stdio
-      Default: 'inherit'
-  --timeout
-      The number of millisecond before sending SIGTERM to the command.
-      One second later, SIGKILL will be send.
-      Default: 0 (no timeout)
-  --target
-      The root directory from which to start exploring.
-      Default: "."
-  --layout-filename
-      The name of the file indicating test layout.
-      Default: '.test.list'
-  --memoization-path
-      The path to the file for reading and writing memoization data.
-      Default: '.turtle.json'
-  --layout
-      Use a predefined layout: ["alongside","separated"].
-      This option overrides the '--format' and '--exclude' options.
-  --format-regexp
-      A regular expression to decompose the parts of a target's relative path.
-  --format-regexp-flags
-      The flags to use for --format-regexp
-      Default: "u"
-  --format-template
-      The template string to format the parts of the target file.
-  --exclude-regexp
-      Regular expression to exclude files from testing when no ordering
-      file is present in the directory.
-      Default: "^\."
-  --exclude-regexp-flags
-      The flags to use for --exclude-regexp.
-      Default: "u
-  --no-memoization
-      Disable memoization.
-  --help
-      Print this message.
-```
+-->
