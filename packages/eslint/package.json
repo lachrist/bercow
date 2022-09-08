@@ -8,9 +8,7 @@
   "dependencies": {
     "eslint": "^8.23.0"
   },
-  "peerDependencies": {
-    "@bercow/core": "^0.0.0"
-  },
+
   "repository": {
     "type": "git",
     "url": "https://github.com/lachrist/bercow.git",

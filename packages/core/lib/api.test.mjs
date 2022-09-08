@@ -110,6 +110,8 @@ const ordering = [
 }
 
 // memoization //
+await bercowAsync({ clean: true }, home);
+await bercowAsync({}, home);
 await bercowAsync({}, home);
 
 // change //

@@ -14,8 +14,6 @@ const home = getTemporaryPath();
 
 await mkdirAsync(home);
 
-assertEqual(await runBercowAsync(["foo", "bar", "qux"], home), 1);
-
 await writeFileAsync(
   joinPath(home, ".bercow.json"),
   stringifyJSON({ plugins: { "./plugin.mjs": "options" } }),
@@ -30,7 +28,7 @@ await writeFileAsync(
       assertEqual(options, "options");
       assertEqual(home, ${JSON.stringify(home)});
       return {
-        lint: async ({content}, _ordering) => "lint-" + content,
+        lint: async ({content}, _infos) => "lint-" + content,
       };
     };
   `,
@@ -41,7 +39,10 @@ await writeFileAsync(joinPath(home, ".ordering"), "foo\n", "utf8");
 
 await writeFileAsync(joinPath(home, "foo"), "content", "utf8");
 
-assertEqual(await runBercowAsync([".bercow.json", "utf8"], home), 0);
+assertEqual(
+  await runBercowAsync([".bercow.json", "utf8", "--help", "--version"], home),
+  undefined,
+);
 
 assertEqual(await readFileAsync(joinPath(home, "foo"), "utf8"), "lint-content");
 

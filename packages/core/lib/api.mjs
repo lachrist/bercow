@@ -14,6 +14,7 @@ import {
 import { linkNothing, lintNothing, testNothing } from "./plugin.mjs";
 
 const default_options = {
+  clean: false,
   link: linkNothing,
   lint: lintNothing,
   test: testNothing,
@@ -91,6 +92,11 @@ export const bercowAsync = async (options, home) => {
     options.encoding,
   );
 
+  if (options.clean) {
+    resetCache(lint_cache);
+    resetCache(test_cache);
+  }
+
   const ordering = extractOrdering(
     resolvePath(home, options["target-directory"]),
     options["ordering-filename"],
@@ -108,8 +114,10 @@ export const bercowAsync = async (options, home) => {
   const lints = readCache(lint_cache);
   const tests = readCache(test_cache);
   resetCache(test_cache);
+
   openCache(lint_cache);
   openCache(test_cache);
+
   const context = {
     link: options.link,
     lint: options.lint,
