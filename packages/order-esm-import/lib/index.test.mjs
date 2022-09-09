@@ -12,8 +12,8 @@ const testAsync = async (content, options, infos) => {
       path: "/home/main.mjs",
       content,
     },
-
     {
+      cwd: "/cwd",
       index: 0,
       ordering: ["/home/main.mjs"],
       logTitle: (_title) => {},

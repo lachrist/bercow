@@ -2,6 +2,7 @@ import { deepEqual as assertDeepEqual } from "node:assert";
 import plugin from "./index.mjs";
 
 const infos = {
+  cwd: "/cwd",
   index: 0,
   ordering: [],
   logTitle: (_title) => {},

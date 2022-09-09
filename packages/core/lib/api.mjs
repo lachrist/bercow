@@ -121,7 +121,7 @@ export const bercowAsync = async (options, home) => {
     const { length } = ordering;
     for (let index = 0; index < length; index += 1) {
       const path = ordering[index];
-      const infos = { index, ordering, ...Log };
+      const infos = { cwd, index, ordering, ...Log };
       const files = [];
       for (const link_path of await linkAsync(path, infos, context)) {
         files.push(await lintAsync(link_path, infos, context));

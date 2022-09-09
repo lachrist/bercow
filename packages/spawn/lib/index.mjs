@@ -13,17 +13,13 @@ export default async (config, home) => {
     options: {},
     ...config,
   };
-  config.options = {
-    cwd: home,
-    ...config.options,
-  };
   return {
     test: async (
       [{ path: main }, { path: test }],
-      { logSubtitle, logParagraph },
+      { cwd, logSubtitle, logParagraph },
     ) => {
       logSubtitle(
-        `testing with ${config.command} ${relativizePath(home, main)}`,
+        `testing with ${config.command} ${relativizePath(cwd, main)}`,
       );
       await spawnAsync(
         logParagraph,
@@ -38,7 +34,10 @@ export default async (config, home) => {
             $RELATIVE_MAIN_PATH: relativizePath(home, main),
           }),
         ),
-        config.command,
+        {
+          ...config.options,
+          cwd: home,
+        },
       );
     },
   };

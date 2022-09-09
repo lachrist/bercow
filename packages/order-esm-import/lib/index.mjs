@@ -112,10 +112,8 @@ export default async (config, _home) => {
     ...config["babel-parser-options"],
   };
   return {
-    lint: async ({ path, content }, { logSubtitle, ordering, index }) => {
-      logSubtitle(
-        `ordering esm imports of ${relativizePath(process.cwd(), path)}`,
-      );
+    lint: async ({ path, content }, { cwd, logSubtitle, ordering, index }) => {
+      logSubtitle(`ordering esm imports of ${relativizePath(cwd, path)}`);
       const { program } = parseBabel(content, babel_parser_options);
       const { head, body } = splitProgramBody(program.body);
       const base = getDirectory(path);

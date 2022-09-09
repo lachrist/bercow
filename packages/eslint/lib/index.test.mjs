@@ -5,6 +5,7 @@ import { join as joinPath } from "node:path";
 import plugin from "./index.mjs";
 
 const infos = {
+  cwd: "/cwd",
   index: 0,
   ordering: [],
   logTitle: (_title) => {},
