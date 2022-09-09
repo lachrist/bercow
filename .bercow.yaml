@@ -7,4 +7,13 @@ plugins:
   '@bercow/eslint':
     babel-parser-options:
       sourceType: module
-  '@bercow/c8': {}
+  '@bercow/spawn':
+    command: npx
+    argv:
+      - c8
+      - --100
+      - --include
+      - $RELATIVE_MAIN_PATH
+      - --
+      - node
+      - $RELATIVE_TEST_PATH
