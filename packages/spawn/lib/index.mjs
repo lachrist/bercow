@@ -1,6 +1,7 @@
 /* eslint-env node */
 import { relative as relativizePath } from "node:path";
 import { spawnAsync } from "./spawn.mjs";
+import { platform } from "node:os";
 
 /* c8 ignore start */
 const {
@@ -17,10 +18,14 @@ const generateSubstitute = (env) => (arg) => hasOwn(env, arg) ? env[arg] : arg;
 export default async (config, home) => {
   config = {
     command: null,
+    "command-windows": null,
     argv: ["$TEST"],
     options: {},
     ...config,
   };
+  if (platform() === "win32" && config["command-windows"] !== null) {
+    config.command = config["command-windows"];
+  }
   return {
     test: async (
       [{ path: main }, { path: test }],

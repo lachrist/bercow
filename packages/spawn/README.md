@@ -2,7 +2,8 @@
 
 Test plugin for the [bercow](https://github.com/lachrist/bercow) test runner which spawns a child process.
 
-* `command <string>` Name of the program.
+* `command <string>` Name of the program to spawn.
+* `command-windows <string>` Name of the program to spawn on windows.
 * `argv <string[]>` Program argument array. *Default* `["$TEST"]`. Recognized variables:
   - `$ABSOLUTE_MAIN_PATH`
   - `$ABSOLUTE_TEST_PATH`

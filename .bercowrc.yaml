@@ -9,6 +9,7 @@ plugins:
       sourceType: module
   '@bercow/spawn':
     command: npx
+    command-windows: npx.cmd
     argv:
       - c8
       - --100

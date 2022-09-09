@@ -1,6 +1,6 @@
 import { extname as getExtension, resolve as resolvePath } from "node:path";
 import { readdirSync as readdir, readFileSync as readFile } from "node:fs";
-import {EOL} from "node:os";
+import { EOL } from "node:os";
 import { load as parseYAML } from "js-yaml";
 
 /* c8 ignore start */

@@ -14,6 +14,8 @@ export const spawnAsync = (logParagraph, command, argv, options) =>
     child.stderr.on("data", logParagraph);
     child.on("error", reject);
     child.on("exit", (status, signal) => {
+      // This is for windows...
+      /* c8 ignore start */
       if (signal !== null) {
         reject(new Error(`${command} ${argv.join(" ")} killed with ${signal}`));
       } else if (status !== 0) {
@@ -25,5 +27,6 @@ export const spawnAsync = (logParagraph, command, argv, options) =>
       } else {
         resolve(undefined);
       }
+      /* c8 ignore stop */
     });
   });
