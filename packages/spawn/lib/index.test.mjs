@@ -1,4 +1,4 @@
-import { equal as assertEqual } from "node:assert";
+import { assertEqual } from "../../../test/fixture.mjs";
 import {
   writeFile as writeFileAsync,
   unlink as unlinkAsync,

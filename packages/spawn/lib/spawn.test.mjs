@@ -1,4 +1,4 @@
-import { equal as assertEqual, rejects as assertReject } from "node:assert";
+import { assertEqual, assertReject } from "../../../test/fixture.mjs";
 import { spawnAsync } from "./spawn.mjs";
 
 const logParagraph = (_paragraph) => {};

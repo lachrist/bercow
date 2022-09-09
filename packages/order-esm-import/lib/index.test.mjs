@@ -1,7 +1,4 @@
-import {
-  equal as assertEqual,
-  rejects as assertReject,
-} from "node:assert/strict";
+import { assertEqual, assertReject } from "../../../test/fixture.mjs";
 import { format as formatPrettier } from "prettier";
 import plugin from "./index.mjs";
 

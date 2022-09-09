@@ -1,11 +1,13 @@
 import { join as joinPath } from "node:path";
 import { tmpdir as getTmpdir } from "node:os";
-export {
-  equal as assertEqual,
-  deepEqual as assertDeepEqual,
-  rejects as assertReject,
-  throws as assertThrow,
-} from "node:assert/strict";
+import { strict as AssertStrict } from "node:assert";
+
+export const {
+  equal: assertEqual,
+  deepEqual: assertDeepEqual,
+  rejects: assertReject,
+  throws: assertThrow,
+} = AssertStrict;
 
 const { now } = Date;
 const { random } = Math;

@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-import { equal as assertEqual, rejects as assertReject } from "node:assert";
+import { assertEqual, assertReject } from "../../../test/fixture.mjs";
 import { join as joinPath } from "node:path";
 import plugin from "./index.mjs";
 

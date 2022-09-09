@@ -1,4 +1,4 @@
-import { deepEqual as assertDeepEqual } from "node:assert";
+import { assertDeepEqual } from "../../../test/fixture.mjs";
 import plugin from "./index.mjs";
 
 const infos = {

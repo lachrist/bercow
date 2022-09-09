@@ -2,7 +2,7 @@ import {
   assertEqual,
   assertDeepEqual,
   getTemporaryPath,
-} from "../test/fixture.mjs";
+} from "../../../test/fixture.mjs";
 
 import { join as joinPath } from "node:path";
 import {

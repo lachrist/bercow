@@ -1,4 +1,4 @@
-import { assertEqual } from "../test/fixture.mjs";
+import { assertEqual } from "../../../test/fixture.mjs";
 import { Buffer } from "node:buffer";
 import { makeHashing, hashChunkArray } from "./hash.mjs";
 

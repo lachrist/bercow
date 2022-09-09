@@ -2,7 +2,7 @@ import {
   assertEqual,
   assertDeepEqual,
   getTemporaryPath,
-} from "../test/fixture.mjs";
+} from "../../../test/fixture.mjs";
 import { writeFileSync as writeFile } from "node:fs";
 import { loadPluginAsync, combinePluginArray } from "./plugin.mjs";
 

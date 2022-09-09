@@ -2,7 +2,7 @@ import {
   getTemporaryPath,
   assertEqual,
   assertThrow,
-} from "../test/fixture.mjs";
+} from "../../../test/fixture.mjs";
 import {
   writeFileSync as writeFile,
   mkdirSync as mkdir,

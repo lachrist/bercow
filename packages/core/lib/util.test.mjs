@@ -2,7 +2,7 @@ import {
   getTemporaryPath,
   assertThrow,
   assertEqual,
-} from "../test/fixture.mjs";
+} from "../../../test/fixture.mjs";
 import { writeFileSync as writeFile, unlinkSync as unlink } from "node:fs";
 import { Buffer } from "node:buffer";
 import { assert, mapMaybe, fromMaybe, readFileMaybe } from "./util.mjs";

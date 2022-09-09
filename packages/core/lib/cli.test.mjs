@@ -1,4 +1,4 @@
-import { assertEqual, getTemporaryPath } from "../test/fixture.mjs";
+import { assertEqual, getTemporaryPath } from "../../../test/fixture.mjs";
 import { join as joinPath } from "node:path";
 import {
   writeFile as writeFileAsync,

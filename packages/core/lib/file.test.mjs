@@ -2,7 +2,7 @@ import {
   assertEqual,
   assertDeepEqual,
   getTemporaryPath,
-} from "../test/fixture.mjs";
+} from "../../../test/fixture.mjs";
 import { writeFileSync as writeFile, readFileSync as readFile } from "node:fs";
 import { makeHashing } from "./hash.mjs";
 import { loadFile, cleanupFile, hashFile, saveFile } from "./file.mjs";
