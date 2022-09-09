@@ -1,6 +1,6 @@
 {
   "name": "@bercow/c8",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "lib/index.mjs",
   "dependencies": {
     "@bercow/spawn": "^0.0.0",
