@@ -3,7 +3,8 @@
   "version": "0.0.2",
   "main": "lib/index.mjs",
   "dependencies": {
-    "eslint": "^8.23.0"
+    "@babel/generator": "^7.19.0",
+    "@babel/parser": "^7.19.0"
   },
   "repository": {
     "type": "git",
