@@ -2,7 +2,15 @@
 import { relative as relativizePath } from "node:path";
 import { spawnAsync } from "./spawn.mjs";
 
-const { hasOwn } = Object;
+/* c8 ignore start */
+const {
+  Reflect: { getOwnPropertyDescriptor },
+  Object: {
+    hasOwn = (object, key) =>
+      getOwnPropertyDescriptor(object, key) !== undefined,
+  },
+} = global;
+/* c8 ignore stop */
 
 const generateSubstitute = (env) => (arg) => hasOwn(env, arg) ? env[arg] : arg;
 

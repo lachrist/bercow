@@ -1,6 +1,14 @@
 import { readFileSync as readFile } from "node:fs";
 
-const { hasOwn } = Object;
+/* c8 ignore start */
+const {
+  Reflect: { getOwnPropertyDescriptor },
+  Object: {
+    hasOwn = (object, key) =>
+      getOwnPropertyDescriptor(object, key) !== undefined,
+  },
+} = global;
+/* c8 ignore stop */
 
 export const assert = (boolean, message) => {
   if (!boolean) {

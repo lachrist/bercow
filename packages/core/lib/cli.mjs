@@ -12,11 +12,16 @@ import {
 } from "./config.mjs";
 import { bercowAsync } from "./api.mjs";
 
+/* c8 ignore start */
 const {
   JSON: { parse: parseJSON },
-  Object: { hasOwn },
-  Reflect: { ownKeys },
+  Reflect: { ownKeys, getOwnPropertyDescriptor },
+  Object: {
+    hasOwn = (object, key) =>
+      getOwnPropertyDescriptor(object, key) !== undefined,
+  },
 } = global;
+/* c8 ignore stop */
 
 export const runBercowAsync = async (argv, cwd) => {
   const { _: positional_argv, ...named_argv } = minimist(argv);

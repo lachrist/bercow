@@ -10,7 +10,17 @@ import {
 import { Buffer } from "node:buffer";
 import { assert } from "./util.mjs";
 
-const { hasOwn } = Object;
+/* c8 ignore start */
+const {
+  undefined,
+  Reflect: { getOwnPropertyDescriptor },
+  Object: {
+    hasOwn = (object, key) =>
+      getOwnPropertyDescriptor(object, key) !== undefined,
+  },
+} = global;
+/* c8 ignore stop */
+
 const { from: toBuffer } = Buffer;
 
 const isNotEmptyString = (any) => any !== "";

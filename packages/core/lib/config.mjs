@@ -2,10 +2,16 @@ import { extname as getExtension, resolve as resolvePath } from "node:path";
 import { readdirSync as readdir, readFileSync as readFile } from "node:fs";
 import { load as parseYAML } from "js-yaml";
 
+/* c8 ignore start */
 const {
-  Object: { hasOwn },
   JSON: { parse: parseJSON },
+  Reflect: { getOwnPropertyDescriptor },
+  Object: {
+    hasOwn = (object, key) =>
+      getOwnPropertyDescriptor(object, key) !== undefined,
+  },
 } = global;
+/* c8 ignore stop */
 
 const parsers = {
   ".json": parseJSON,
