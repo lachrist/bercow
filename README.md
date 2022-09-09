@@ -28,8 +28,8 @@ Testers: run the test file
 * `target-directory <string>` Where to start looking for files to test. *Default* `"."`.
 * `ordering-filename <string>` Name of the files containing the ordering. *Default* `".ordering"`.
 * `ordering-pattern <string> | null` The body of a regular expression for filtering filenames of when the ordering file is missing. *Default* `null`, an error is thrown when the ordering file is missing.
-* `lint-cache-file <string>` Path of the lint cache. *Default* `"tmp/bercow-lint.txt"`.
-* `test-cache-file <string>` Path of the test cache. *Default* `"tmp/bercow-test.txt"`.
+* `lint-cache-file <string> | null` Path for lint caching. *Default* `null`: a file in `./tmp` whose name is based on the content of the configuration.
+* `test-cache-file <string> | null` Path for test caching. *Default* `null`: a file in `./tmp` whose name is based on the content of the configuration.
 * `clean <boolean>` Clear caches before running. *Default* `false`.
 * `encoding <string>` Charset encoding to use for all the files. *Default* `"utf8"`.
 

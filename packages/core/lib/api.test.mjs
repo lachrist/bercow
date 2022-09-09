@@ -110,9 +110,17 @@ const ordering = [
 }
 
 // memoization //
-await bercowAsync({ clean: true }, home);
-await bercowAsync({}, home);
-await bercowAsync({}, home);
+await bercowAsync({}, { clean: true }, home);
+await bercowAsync(
+  {},
+  {
+    "lint-cache-file": "./tmp/bercow-lint",
+    "test-cache-file": "./tmp/bercow-test",
+  },
+  home,
+);
+await bercowAsync({}, {}, home);
+await bercowAsync({}, {}, home);
 
 // change //
 await writeFileAsync(joinPath(home, "file1"), "content3", "utf8");

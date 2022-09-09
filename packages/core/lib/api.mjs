@@ -66,37 +66,52 @@ export const bercowAsync = async (options, home) => {
     ...options,
   };
 
+  config = resolveConfig(
+    {
+      ...getDefaultConfig(),
+      ...config,
+    },
+
+    cwd,
+  );
+
+  const ordering = loadOrdering(
+    config["target-directory"],
+    config["ordering-filename"],
+    config["ordering-pattern"],
+    config["ordering-separator"],
+    config.encoding,
+  );
+
+  const hashing = makeHashing(
+    config["hash-algorithm"],
+    config["hash-separator"],
+    config["hash-input-encoding"],
+    config["hash-output-encoding"],
+  );
+
+  const hash = hashChunkArray([stringifyJSON(config)], hashing);
+
   const lint_cache = makeCache(
-    resolvePath(home, options["lint-cache-file"]),
-    options["cache-separator"],
-    options.encoding,
+    config["lint-cache-file"] === null
+      ? joinPath(cwd, "tmp", `bercow-${hash}-lint.txt`)
+      : config["lint-cache-file"],
+    config["cache-separator"],
+    config.encoding,
   );
 
   const test_cache = makeCache(
-    resolvePath(home, options["test-cache-file"]),
-    options["cache-separator"],
-    options.encoding,
+    config["test-cache-file"] === null
+      ? joinPath(cwd, "tmp", `bercow-${hash}-test.txt`)
+      : config["test-cache-file"],
+    config["cache-separator"],
+    config.encoding,
   );
 
   if (options.clean) {
     resetCache(lint_cache);
     resetCache(test_cache);
   }
-
-  const ordering = loadOrdering(
-    resolvePath(home, options["target-directory"]),
-    options["ordering-filename"],
-    options["ordering-pattern"],
-    options["ordering-separator"],
-    options.encoding,
-  );
-
-  const hashing = makeHashing(
-    options["hash-algorithm"],
-    options["hash-separator"],
-    options["hash-input-encoding"],
-    options["hash-output-encoding"],
-  );
 
   const lints = readCache(lint_cache);
   const tests = readCache(test_cache);
