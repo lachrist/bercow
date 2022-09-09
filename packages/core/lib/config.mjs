@@ -1,5 +1,6 @@
 import { extname as getExtension, resolve as resolvePath } from "node:path";
 import { readdirSync as readdir, readFileSync as readFile } from "node:fs";
+import {EOL} from "node:os";
 import { load as parseYAML } from "js-yaml";
 
 /* c8 ignore start */
@@ -31,12 +32,12 @@ export const default_config = {
   plugins: [],
   encoding: "utf8",
   "target-directory": ".",
-  "cache-separator": "\n",
+  "cache-separator": EOL,
   "lint-cache-file": null,
   "test-cache-file": null,
   "ordering-filename": ".ordering",
   "ordering-pattern": null,
-  "ordering-separator": "\n",
+  "ordering-separator": EOL,
   "hash-algorithm": "sha256",
   "hash-input-encoding": "utf8",
   "hash-output-encoding": "base64",

@@ -1,6 +1,6 @@
 {
   "name": "@bercow/core",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "lib/api.js",
   "bin": {
     "bercow": "bin/bercow.mjs"
