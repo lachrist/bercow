@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "lib/index.mjs",
   "dependencies": {
+    "@bercow/spawn": "^0.0.0",
     "c8": "^7.12.0"
   },
   "repository": {

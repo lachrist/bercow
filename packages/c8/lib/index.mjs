@@ -1,6 +1,9 @@
-/* eslint-env node */ import { relative as relativizePath } from "node:path";
+/* eslint-env node */
+import { relative as relativizePath } from "node:path";
 import { relative as toRelativePath } from "node:path";
-import { spawnAsync } from "./spawn.mjs";
+import { spawnAsync } from "@bercow/spawn";
+
+const options = {};
 
 export default async (config, _home) => {
   config = {
@@ -16,13 +19,16 @@ export default async (config, _home) => {
       await spawnAsync(
         logParagraph,
         "npx",
-        "c8",
-        ...config["c8-argv"],
-        "--include",
-        toRelativePath(process.cwd(), main),
-        "--",
-        "node",
-        test,
+        [
+          "c8",
+          ...config["c8-argv"],
+          "--include",
+          toRelativePath(process.cwd(), main),
+          "--",
+          "node",
+          test,
+        ],
+        options,
       );
     },
   };
