@@ -31,7 +31,7 @@ await writeFileAsync(
 
 await writeFileAsync(
   joinPath(home, "directory", ".ordering"),
-  "file2\n",
+  `file2${EOL}`,
   "utf8",
 );
 

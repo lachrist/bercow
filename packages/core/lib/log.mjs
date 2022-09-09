@@ -1,4 +1,5 @@
 import { writeSync as write } from "node:fs";
+import { EOL } from "node:os";
 
 import { Buffer } from "node:buffer";
 import { default as Chalk } from "chalk";
@@ -12,11 +13,11 @@ const log = (message) => {
 };
 
 export const logTitle = (title) => {
-  log(chalkBlue(`${title} ...\n`));
+  log(chalkBlue(`${title} ...${EOL}`));
 };
 
 export const logSubtitle = (subtitle) => {
-  log(chalkBlue(`  > ${subtitle} ...\n`));
+  log(chalkBlue(`  > ${subtitle} ...${EOL}`));
 };
 
 export const logParagraph = (paragraph) => {

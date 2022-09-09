@@ -3,6 +3,7 @@ import { readFileSync as readFile } from "node:fs";
 import { createRequire } from "node:module";
 import { default as minimist } from "minimist";
 import { fileURLToPath } from "node:url";
+import { EOL } from "node:os";
 import { loadPluginAsync, combinePluginArray } from "./plugin.mjs";
 import {
   getDefaultConfig,
@@ -30,12 +31,11 @@ export const runBercowAsync = async (argv, cwd) => {
     const { version } = parseJSON(
       readFile(joinPath(__dirname, "..", "package.json"), "utf8"),
     );
-
-    process.stdout.write(`@bercow/core v${version}\n`);
+    process.stdout.write(`@bercow/core v${version}${EOL}`);
   }
   if (hasOwn(named_argv, "help")) {
     process.stdout.write(
-      "usage: npx bercow [config-file] [config-encoding] [...config-field]\n",
+      `usage: npx bercow [config-file] [config-encoding] [...config-field]${EOL}`,
     );
   }
   const [maybe_relative_path = null, encoding = "utf8"] = positional_argv;
