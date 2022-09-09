@@ -27,6 +27,7 @@ Testers: run the test file
 * `plugins <Object>` Mapping from plugin name/path to plugin options. *Default* `{}`, `bercow` will not do anything.
 * `target-directory <string>` Where to start looking for files to test. *Default* `"."`.
 * `ordering-filename <string>` Name of the files containing the ordering. *Default* `".ordering"`.
+* `ordering-pattern <string> | null` The body of a regular expression for filtering filenames of when the ordering file is missing. *Default* `null`, an error is thrown when the ordering file is missing.
 * `lint-cache-file <string>` Path of the lint cache. *Default* `"tmp/bercow-lint.txt"`.
 * `test-cache-file <string>` Path of the test cache. *Default* `"tmp/bercow-test.txt"`.
 * `clean <boolean>` Clear caches before running. *Default* `false`.

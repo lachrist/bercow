@@ -1,5 +1,4 @@
-import { join as joinPath, resolve as resolvePath } from "node:path";
-import { readFileSync as readFile, statSync as stat } from "node:fs";
+import { resolve as resolvePath } from "node:path";
 import * as Log from "./log.mjs";
 import { makeHashing, hashChunkArray } from "./hash.mjs";
 import { loadFile, saveFile, cleanupFile, hashFile } from "./file.mjs";
@@ -12,9 +11,11 @@ import {
   closeCache,
 } from "./cache.mjs";
 import { linkNothing, lintNothing, testNothing } from "./plugin.mjs";
+import { loadOrdering } from "./ordering.mjs";
 
 const default_options = {
   clean: false,
+  deny: linkNothing,
   link: linkNothing,
   lint: lintNothing,
   test: testNothing,
@@ -24,27 +25,12 @@ const default_options = {
   "lint-cache-file": "tmp/bercow-lint.txt",
   "test-cache-file": "tmp/bercow-test.txt",
   "ordering-filename": ".ordering",
+  "ordering-pattern": null,
   "ordering-separator": "\n",
   "hash-algorithm": "sha256",
   "hash-input-encoding": "utf8",
   "hash-output-encoding": "base64",
   "hash-separator": "\0",
-};
-
-const isNotEmptyString = (any) => any !== "";
-
-const extractOrdering = (path, filename, separator, encoding) => {
-  if (stat(path).isDirectory()) {
-    return readFile(joinPath(path, filename))
-      .toString(encoding)
-      .split(separator)
-      .filter(isNotEmptyString)
-      .flatMap((entry) =>
-        extractOrdering(joinPath(path, entry), filename, separator, encoding),
-      );
-  } else {
-    return [path];
-  }
 };
 
 const linkAsync = async (path, infos, context) =>
@@ -97,9 +83,10 @@ export const bercowAsync = async (options, home) => {
     resetCache(test_cache);
   }
 
-  const ordering = extractOrdering(
+  const ordering = loadOrdering(
     resolvePath(home, options["target-directory"]),
     options["ordering-filename"],
+    options["ordering-pattern"],
     options["ordering-separator"],
     options.encoding,
   );
