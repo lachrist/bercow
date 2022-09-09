@@ -1,8 +1,11 @@
+import { join as joinPath } from "node:path";
 import { assertDeepEqual } from "../../../test/fixture.mjs";
 import plugin from "./index.mjs";
 
+const cwd = process.cwd();
+
 const infos = {
-  cwd: "/cwd",
+  cwd,
   index: 0,
   ordering: [],
   logTitle: (_title) => {},
@@ -10,9 +13,9 @@ const infos = {
   logParagraph: (_paragraph) => {},
 };
 
-const { link } = await plugin({}, "/home");
+const { link } = await plugin({}, cwd);
 
-assertDeepEqual(await link("/home/directory/file.ext", infos), [
-  "/home/directory/file.ext",
-  "/home/test/directory/file.ext",
+assertDeepEqual(await link(joinPath(cwd, "dir", "file.ext"), infos), [
+  joinPath(cwd, "dir", "file.ext"),
+  joinPath(cwd, "test", "dir", "file.ext"),
 ]);

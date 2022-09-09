@@ -3,7 +3,7 @@ import {
   assertDeepEqual,
   getTemporaryPath,
 } from "../../../test/fixture.mjs";
-
+import { EOL } from "node:os";
 import { join as joinPath } from "node:path";
 import {
   writeFile as writeFileAsync,
@@ -23,7 +23,11 @@ await writeFileAsync(joinPath(home, "file1"), "content1", "utf8");
 
 await writeFileAsync(joinPath(home, "directory", "file2"), "content2", "utf8");
 
-await writeFileAsync(joinPath(home, ".ordering"), "file1\ndirectory\n", "utf8");
+await writeFileAsync(
+  joinPath(home, ".ordering"),
+  `file1${EOL}directory${EOL}`,
+  "utf8",
+);
 
 await writeFileAsync(
   joinPath(home, "directory", ".ordering"),

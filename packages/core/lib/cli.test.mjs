@@ -35,7 +35,7 @@ await writeFileAsync(
   "utf8",
 );
 
-await writeFileAsync(joinPath(home, ".ordering"), "foo\n", "utf8");
+await writeFileAsync(joinPath(home, ".ordering"), "foo", "utf8");
 
 await writeFileAsync(joinPath(home, "foo"), "content", "utf8");
 

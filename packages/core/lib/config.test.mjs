@@ -35,7 +35,7 @@ writeFile(
   "utf8",
 );
 
-writeFile(joinPath(home, ".bercowrc"), "target-directory: ./yaml\n", "utf8");
+writeFile(joinPath(home, ".bercowrc"), "target-directory: ./yaml", "utf8");
 
 const test = (maybe) =>
   resolveConfig(

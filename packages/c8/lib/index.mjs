@@ -1,11 +1,11 @@
 /* eslint-env node */
 import { relative as relativizePath } from "node:path";
-import { relative as toRelativePath } from "node:path";
+import { platform } from "node:os";
 import { spawnAsync } from "../../spawn/lib/spawn.mjs";
 
 const options = {};
 
-export default async (config, _home) => {
+export default async (config, home) => {
   config = {
     "c8-argv": ["--100"],
     ...config,
@@ -18,17 +18,22 @@ export default async (config, _home) => {
       logSubtitle(`testing with c8 ${relativizePath(cwd, main)}`);
       await spawnAsync(
         logParagraph,
-        "npx",
+        /* c8 ignore start */
+        platform() === "win32" ? "npx.cmd" : "npx",
+        /* c8 ignore stop */
         [
           "c8",
           ...config["c8-argv"],
           "--include",
-          toRelativePath(process.cwd(), main),
+          relativizePath(home, main),
           "--",
           "node",
           test,
         ],
-        options,
+        {
+          ...options,
+          cwd: home,
+        },
       );
     },
   };

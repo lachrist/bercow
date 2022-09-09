@@ -8,8 +8,10 @@ import { tmpdir as getTmpdir } from "node:os";
 import { join as joinPath } from "node:path";
 import plugin from "./index.mjs";
 
+const cwd = process.cwd();
+
 const infos = {
-  cwd: "/cwd",
+  cwd,
   index: 0,
   ordering: [],
   logTitle: (_title) => {},
@@ -32,7 +34,7 @@ await writeFileAsync(
   "utf8",
 );
 
-const { test } = await plugin({}, "/home");
+const { test } = await plugin({}, home);
 
 assertEqual(
   await test(

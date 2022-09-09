@@ -3,6 +3,7 @@ import {
   assertDeepEqual,
   getTemporaryPath,
 } from "../../../test/fixture.mjs";
+import { EOL } from "node:os";
 import { writeFileSync as writeFile, readFileSync as readFile } from "node:fs";
 import {
   makeCache,
@@ -15,11 +16,11 @@ import {
 
 const path = getTemporaryPath();
 
-const cache = makeCache(path, "\n", "utf8");
+const cache = makeCache(path, EOL, "utf8");
 
 assertDeepEqual(readCache(cache), []);
 
-writeFile(path, "entry1\nentry2\n", "utf8");
+writeFile(path, `entry1${EOL}entry2${EOL}`, "utf8");
 
 assertDeepEqual(readCache(cache), ["entry1", "entry2"]);
 
@@ -27,7 +28,7 @@ assertEqual(openCache(cache), undefined);
 
 updateCache(cache, "entry3");
 
-assertEqual(readFile(path, "utf8"), "entry1\nentry2\nentry3\n");
+assertEqual(readFile(path, "utf8"), `entry1${EOL}entry2${EOL}entry3${EOL}`);
 
 assertEqual(closeCache(cache), undefined);
 

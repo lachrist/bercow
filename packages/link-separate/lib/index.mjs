@@ -8,7 +8,7 @@ export default async (config, home) => {
   };
   return {
     link: async (path, { cwd, logTitle }) => {
-      logTitle(`${relativizePath(cwd, path)}`);
+      logTitle(relativizePath(cwd, path));
       return [
         path,
         joinPath(

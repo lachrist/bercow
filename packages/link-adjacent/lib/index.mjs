@@ -8,7 +8,7 @@ export default async (config, _home) => {
   };
   return {
     link: async (path, { cwd, logTitle }) => {
-      logTitle(`${relativizePath(cwd, path)}`);
+      logTitle(relativizePath(cwd, path));
       const segments = path.split(".");
       if (config["final-extension"] !== null) {
         segments.pop();

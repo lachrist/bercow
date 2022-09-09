@@ -1,9 +1,7 @@
-/* eslint-env node */
-import { relative as relativizePath } from "node:path";
-import { spawnAsync } from "./spawn.mjs";
+/* eslint-env node */ import { relative as relativizePath } from "node:path";
 import { platform } from "node:os";
 
-/* c8 ignore start */
+/* c8 ignore start */ import { spawnAsync } from "./spawn.mjs";
 const {
   Reflect: { getOwnPropertyDescriptor },
   Object: {
@@ -23,9 +21,11 @@ export default async (config, home) => {
     options: {},
     ...config,
   };
+  /* c8 ignore start */
   if (platform() === "win32" && config["command-windows"] !== null) {
     config.command = config["command-windows"];
   }
+  /* c8 ignore stop */
   return {
     test: async (
       [{ path: main }, { path: test }],
@@ -34,6 +34,7 @@ export default async (config, home) => {
       logSubtitle(
         `testing with ${config.command} ${relativizePath(cwd, main)}`,
       );
+
       await spawnAsync(
         logParagraph,
         config.command,
@@ -47,6 +48,7 @@ export default async (config, home) => {
             $RELATIVE_MAIN_PATH: relativizePath(home, main),
           }),
         ),
+
         {
           ...config.options,
           cwd: home,
