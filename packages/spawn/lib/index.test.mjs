@@ -1,21 +1,37 @@
-import { equal as assertEqual, rejects as assertReject } from "node:assert";
-import { spawnAsync } from "./index.mjs";
+import { equal as assertEqual } from "node:assert";
+import {
+  writeFile as writeFileAsync,
+  unlink as unlinkAsync,
+} from "fs/promises";
+import { tmpdir as getTmpdir } from "node:os";
+import { join as joinPath } from "node:path";
+import plugin from "./index.mjs";
 
-const logParagraph = (_paragraph) => {};
+const infos = {
+  index: 0,
+  ordering: [],
+  logTitle: (_title) => {},
+  logSubtitle: (_subtitle) => {},
+  logParagraph: (_paragraph) => {},
+};
 
-const options = {};
-
-assertEqual(
-  await spawnAsync(logParagraph, "/bin/sh", ["-c", "echo FOO"], options),
-  undefined,
+const path = joinPath(
+  getTmpdir(),
+  `test_turtle_${Date.now().toString(36)}_${Math.random()
+    .toString(36)
+    .slice(2)}.mjs`,
 );
 
-assertReject(
-  async () =>
-    await spawnAsync(logParagraph, "/bin/sh", ["-c", "exit 1"], options),
+await writeFileAsync(path, "123;");
+
+const { test } = await plugin(
+  {
+    command: "node",
+    argv: ["--version", "$TEST"],
+  },
+  getTmpdir(),
 );
 
-assertReject(
-  async () =>
-    await spawnAsync(logParagraph, "/bin/sh", ["-c", "kill $$"], options),
-);
+assertEqual(await test([{ path }, { path }], infos), undefined);
+
+await unlinkAsync(path);

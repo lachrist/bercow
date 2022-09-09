@@ -1,7 +1,7 @@
 /* eslint-env node */
 import { relative as relativizePath } from "node:path";
 import { relative as toRelativePath } from "node:path";
-import { spawnAsync } from "@bercow/spawn";
+import { spawnAsync } from "../../spawn/lib/spawn.mjs";
 
 const options = {};
 
