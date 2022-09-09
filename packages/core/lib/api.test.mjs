@@ -53,6 +53,7 @@ const ordering = [
         trace.push({ type: "test", files, infos: { ordering, index } });
       },
     },
+    {},
     home,
   );
 
@@ -128,6 +129,7 @@ await bercowAsync(
   {
     lint: ({ content }, _ordering) => `lint-${content}`,
   },
+  {},
   home,
 );
 

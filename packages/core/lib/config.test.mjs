@@ -1,13 +1,53 @@
-import { getTemporaryPath, assertDeepEqual } from "../test/fixture.mjs";
-import { writeFileSync as writeFile } from "node:fs";
-import { loadConfig } from "./config.mjs";
+import {
+  getTemporaryPath,
+  assertEqual,
+  assertThrow,
+} from "../test/fixture.mjs";
+import {
+  writeFileSync as writeFile,
+  mkdirSync as mkdir,
+  rmSync as rm,
+} from "node:fs";
+import { join as joinPath } from "node:path";
+import {
+  getDefaultConfig,
+  resolveConfig,
+  resolveConfigPath,
+  loadConfig,
+} from "./config.mjs";
 
-const { stringify: stringifyJSON } = JSON;
+const {
+  JSON: { stringify: stringifyJSON },
+} = global;
 
-const path = `${getTemporaryPath()}.json`;
+const home = getTemporaryPath();
 
-assertDeepEqual(loadConfig(path, "utf8"), {});
+mkdir(home);
 
-writeFile(path, stringifyJSON({ foo: "bar" }), "utf8");
+assertThrow(
+  () => resolveConfigPath(null, home),
+  /^Error: Could not find bercow configuration file/u,
+);
 
-assertDeepEqual(loadConfig(path, "utf8"), { foo: "bar" });
+writeFile(
+  joinPath(home, ".bercowrc.json"),
+  stringifyJSON({ "target-directory": "./json" }),
+  "utf8",
+);
+
+writeFile(joinPath(home, ".bercowrc"), "target-directory: ./yaml\n", "utf8");
+
+const test = (maybe) =>
+  resolveConfig(
+    {
+      ...getDefaultConfig(),
+      ...loadConfig(resolveConfigPath(maybe, home), "utf8"),
+    },
+    home,
+  )["target-directory"];
+
+assertEqual(test(null), joinPath(home, "json"));
+
+assertEqual(test(".bercowrc"), joinPath(home, "yaml"));
+
+rm(home, { recursive: true });

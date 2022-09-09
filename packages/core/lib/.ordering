@@ -5,6 +5,6 @@ file.mjs
 cache.mjs
 plugin.mjs
 ordering.mjs
-api.mjs
 config.mjs
+api.mjs
 cli.mjs

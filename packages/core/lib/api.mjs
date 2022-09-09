@@ -1,4 +1,4 @@
-import { resolve as resolvePath } from "node:path";
+import { join as joinPath } from "node:path";
 import * as Log from "./log.mjs";
 import { makeHashing, hashChunkArray } from "./hash.mjs";
 import { loadFile, saveFile, cleanupFile, hashFile } from "./file.mjs";
@@ -12,26 +12,11 @@ import {
 } from "./cache.mjs";
 import { linkNothing, lintNothing, testNothing } from "./plugin.mjs";
 import { loadOrdering } from "./ordering.mjs";
+import { getDefaultConfig, resolveConfig } from "./config.mjs";
 
-const default_options = {
-  clean: false,
-  deny: linkNothing,
-  link: linkNothing,
-  lint: lintNothing,
-  test: testNothing,
-  encoding: "utf8",
-  "target-directory": ".",
-  "cache-separator": "\n",
-  "lint-cache-file": "tmp/bercow-lint.txt",
-  "test-cache-file": "tmp/bercow-test.txt",
-  "ordering-filename": ".ordering",
-  "ordering-pattern": null,
-  "ordering-separator": "\n",
-  "hash-algorithm": "sha256",
-  "hash-input-encoding": "utf8",
-  "hash-output-encoding": "base64",
-  "hash-separator": "\0",
-};
+const {
+  JSON: { stringify: stringifyJSON },
+} = global;
 
 const linkAsync = async (path, infos, context) =>
   await context.link(path, infos);
@@ -60,10 +45,12 @@ const testAsync = async (files, infos, context) => {
   updateCache(context.test_cache, hash);
 };
 
-export const bercowAsync = async (options, home) => {
-  options = {
-    ...default_options,
-    ...options,
+export const bercowAsync = async (plugin, config, cwd) => {
+  plugin = {
+    link: linkNothing,
+    lint: lintNothing,
+    test: testNothing,
+    ...plugin,
   };
 
   config = resolveConfig(
@@ -108,7 +95,7 @@ export const bercowAsync = async (options, home) => {
     config.encoding,
   );
 
-  if (options.clean) {
+  if (config.clean) {
     resetCache(lint_cache);
     resetCache(test_cache);
   }
@@ -121,10 +108,8 @@ export const bercowAsync = async (options, home) => {
   openCache(test_cache);
 
   const context = {
-    link: options.link,
-    lint: options.lint,
-    test: options.test,
-    encoding: options.encoding,
+    ...plugin,
+    encoding: config.encoding,
     hashing,
     lint_cache,
     test_cache,
