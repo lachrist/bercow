@@ -17,7 +17,7 @@ const infos = {
 
 const path = joinPath(
   getTmpdir(),
-  `test_turtle_${Date.now().toString(36)}_${Math.random()
+  `bercow-${Date.now().toString(36)}-${Math.random()
     .toString(36)
     .slice(2)}.mjs`,
 );

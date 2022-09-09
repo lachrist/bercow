@@ -18,9 +18,7 @@ const infos = {
 
 const home = joinPath(
   getTmpdir(),
-  `test_turtle_${Date.now().toString(36)}_${Math.random()
-    .toString(36)
-    .slice(2)}`,
+  `bercow-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
 );
 
 await mkdirAsync(home);

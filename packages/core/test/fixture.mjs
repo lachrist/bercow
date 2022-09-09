@@ -13,5 +13,5 @@ const { random } = Math;
 export const getTemporaryPath = () =>
   joinPath(
     getTmpdir(),
-    `test_turtle_${now().toString(36)}_${random().toString(36).slice(2)}`,
+    `bercow-${now().toString(36)}_${random().toString(36).slice(2)}`,
   );
