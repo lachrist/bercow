@@ -1,6 +1,6 @@
 {
   "name": "@bercow/link-adjacent",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "lib/index.mjs",
   "dependencies": {
     "eslint": "^8.23.0"
