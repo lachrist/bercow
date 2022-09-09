@@ -1,3 +1,5 @@
+import { pathToFileURL } from "node:url";
+
 export const isNotNull = (any) => any !== null;
 
 const getLink = ({ link }) => link;
@@ -50,7 +52,7 @@ export const loadPluginAsync = async (path, options, home) => ({
   link: null,
   lint: null,
   test: null,
-  ...(await (await import(path)).default(options, home)),
+  ...(await (await import(pathToFileURL(path))).default(options, home)),
 });
 
 export const combinePluginArray = (plugins) => ({
