@@ -1,4 +1,4 @@
-# @bercow/c8
+# @bercow/spawn
 
 Test plugin for the [bercow](https://github.com/lachrist/bercow) test runner which spawns a child process.
 
