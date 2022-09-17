@@ -4,7 +4,10 @@ A test runner with a plugin system that has a *strong* emphasis on running tests
 
 ## Example
 
-This repository :)
+This repository
+- [config file](.bercowrc.yaml)
+- [top-level ordering](.ordering)
+- [package ordering](packages/.ordering)
 
 ## Plugins
 
@@ -20,7 +23,7 @@ Linters: format/lint application files and test files
 - [order-esm-import](packages/order-esm-import)
 
 Testers: run the test file
-- [c8](packages/c8)
+- [spawn](packages/spawn)
 
 ## Common Options
 
