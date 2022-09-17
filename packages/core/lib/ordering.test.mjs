@@ -24,7 +24,11 @@ writeFile(joinPath(home, "dir", "file2"), "content2", "utf8");
 
 writeFile(joinPath(home, "dir", "file3"), "content3", "utf8");
 
-writeFile(joinPath(home, ".ordering"), `file1${EOL}dir${EOL}`, "utf8");
+writeFile(
+  joinPath(home, ".ordering"),
+  ["  # comment  ", "  file1  ", "  \t  ", "dir"].join(EOL),
+  "utf8",
+);
 
 assertThrow(
   () => loadOrdering(home, ".ordering", null, EOL, "utf8"),

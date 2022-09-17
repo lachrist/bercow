@@ -4,14 +4,16 @@ import { mapMaybe, readFileMaybe } from "./util.mjs";
 
 const makeRegExp = (pattern) => new RegExp(pattern, "u");
 
+const trim = (string) => string.trim();
+
+const isNotEmptyLine = (string) => string !== "" && string[0] !== "#";
+
 const generatePredicate = (regexp) => (dirent) =>
   dirent.isDirectory() || regexp.test(dirent.name);
 
 const compare = (string1, string2) => string1.localeCompare(string2);
 
 const getName = ({ name }) => name;
-
-const isNotEmptyString = (any) => any !== "";
 
 const generateExtend = (base) => (filename) => joinPath(base, filename);
 
@@ -41,7 +43,8 @@ const loadDirectoryOrdering = (
     return maybe_buffer
       .toString(encoding)
       .split(separator)
-      .filter(isNotEmptyString);
+      .map(trim)
+      .filter(isNotEmptyLine);
   }
 };
 
