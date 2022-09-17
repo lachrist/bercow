@@ -3,7 +3,7 @@ import {
   writeFile as writeFileAsync,
   unlink as unlinkAsync,
 } from "fs/promises";
-import { tmpdir as getTmpdir } from "node:os";
+import { tmpdir as getTmpdir, platform } from "node:os";
 import { join as joinPath } from "node:path";
 import plugin from "./index.mjs";
 
@@ -27,7 +27,7 @@ await writeFileAsync(path, "123;");
 
 const { test } = await plugin(
   {
-    command: "node",
+    [`command-${platform()}`]: "node",
     argv: ["--version", "$TEST"],
   },
   getTmpdir(),

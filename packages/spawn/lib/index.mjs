@@ -1,31 +1,31 @@
-/* eslint-env node */ import { relative as relativizePath } from "node:path";
+/* eslint-env node */
+import { relative as relativizePath } from "node:path";
 import { platform } from "node:os";
+import { spawnAsync } from "./spawn.mjs";
 
-/* c8 ignore start */ import { spawnAsync } from "./spawn.mjs";
 const {
   Reflect: { getOwnPropertyDescriptor },
   Object: {
+    /* c8 ignore start */
     hasOwn = (object, key) =>
       getOwnPropertyDescriptor(object, key) !== undefined,
+    /* c8 ignore stop */
   },
 } = global;
-/* c8 ignore stop */
 
 const generateSubstitute = (env) => (arg) => hasOwn(env, arg) ? env[arg] : arg;
 
 export default async (config, home) => {
   config = {
     command: null,
-    "command-windows": null,
     argv: ["$TEST"],
     options: {},
     ...config,
   };
-  /* c8 ignore start */
-  if (platform() === "win32" && config["command-windows"] !== null) {
-    config.command = config["command-windows"];
+  const key = `command-${platform()}`;
+  if (hasOwn(config, key) && config[key] !== null) {
+    config.command = config[key];
   }
-  /* c8 ignore stop */
   return {
     test: async (
       [{ path: main }, { path: test }],
@@ -34,7 +34,6 @@ export default async (config, home) => {
       logSubtitle(
         `testing with ${config.command} ${relativizePath(cwd, main)}`,
       );
-
       await spawnAsync(
         logParagraph,
         config.command,
@@ -48,7 +47,6 @@ export default async (config, home) => {
             $RELATIVE_MAIN_PATH: relativizePath(home, main),
           }),
         ),
-
         {
           ...config.options,
           cwd: home,
