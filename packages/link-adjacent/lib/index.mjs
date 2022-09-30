@@ -1,14 +1,12 @@
-import { relative as relativizePath } from "node:path";
-
-export default async (config, _home) => {
+export default async (config) => {
   config = {
     "additional-extension": "test",
     "final-extension": null,
     ...config,
   };
   return {
-    link: async (path, { cwd, logTitle }) => {
-      logTitle(relativizePath(cwd, path));
+    link: async (path, { logTitle }) => {
+      logTitle(path);
       const segments = path.split(".");
       if (config["final-extension"] !== null) {
         segments.pop();

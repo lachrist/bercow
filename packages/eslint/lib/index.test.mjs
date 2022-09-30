@@ -1,11 +1,9 @@
 /* eslint-env node */
 
-import { assertEqual, assertReject } from "../../../test/fixture.mjs";
-import { join as joinPath } from "node:path";
+import { assertEqual, assertRejectAsync } from "../../../test/fixture.mjs";
 import plugin from "./index.mjs";
 
 const infos = {
-  cwd: "/cwd",
   index: 0,
   ordering: [],
   logTitle: (_title) => {},
@@ -15,10 +13,10 @@ const infos = {
 
 const { lint } = await plugin({}, process.cwd());
 
-await assertReject(
+await assertRejectAsync(
   lint(
     {
-      path: joinPath(process.cwd(), "file.mjs"),
+      path: "file.mjs",
       content: "missing_global;",
     },
     infos,
@@ -28,7 +26,7 @@ await assertReject(
 assertEqual(
   await lint(
     {
-      path: joinPath(process.cwd(), "file.mjs"),
+      path: "file.mjs",
       content: "123;",
     },
     infos,

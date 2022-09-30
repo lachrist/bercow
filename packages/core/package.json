@@ -1,13 +1,15 @@
 {
   "name": "@bercow/core",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "main": "lib/api.js",
   "bin": {
     "bercow": "bin/bercow.mjs"
   },
   "dependencies": {
     "chalk": "^5.0.1",
+    "glob": "^8.0.3",
     "js-yaml": "^4.1.0",
+    "minimatch": "^5.1.0",
     "minimist": "^1.2.6"
   },
   "repository": {

@@ -1,6 +1,12 @@
+import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
+import { isNotNull } from "./util.mjs";
 
-export const isNotNull = (any) => any !== null;
+const {
+  process: { cwd: getCwd },
+} = global;
+
+const { resolve } = createRequire(`${getCwd()}/`);
 
 const getLink = ({ link }) => link;
 
@@ -48,11 +54,11 @@ const compile = (plugins, getClosure, nothing, combine) => {
   }
 };
 
-export const loadPluginAsync = async (path, options, home) => ({
+export const loadPluginAsync = async (path, options) => ({
   link: null,
   lint: null,
   test: null,
-  ...(await (await import(pathToFileURL(path))).default(options, home)),
+  ...(await (await import(pathToFileURL(resolve(path)))).default(options)),
 });
 
 export const combinePluginArray = (plugins) => ({

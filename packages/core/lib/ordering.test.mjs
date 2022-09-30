@@ -1,44 +1,54 @@
 import {
-  assertThrow,
+  assertRejectAsync,
   assertDeepEqual,
-  getTemporaryPath,
+  makeTempDirAsync,
 } from "../../../test/fixture.mjs";
-import { join as joinPath } from "node:path";
-import { EOL } from "node:os";
 import {
-  writeFileSync as writeFile,
-  mkdirSync as mkdir,
-  rmSync as rm,
-} from "node:fs";
-import { loadOrdering } from "./ordering.mjs";
+  writeFile as writeFileAsync,
+  mkdir as mkdirAsync,
+  rm as rmAsync,
+} from "node:fs/promises";
+import { loadOrderingAsync } from "./ordering.mjs";
 
-const home = getTemporaryPath();
+const home = await makeTempDirAsync();
 
-mkdir(home);
+const config = {
+  "target-directory": home,
+  encoding: "utf8",
+  "ordering-separator": "\n",
+  "ordering-filename": ".ordering",
+  "ordering-ignore-filename": ".ordering-ignore",
+};
 
-mkdir(joinPath(home, "dir"));
+await mkdirAsync(`${home}/dir`);
 
-writeFile(joinPath(home, "file1"), "content1", "utf8");
+await writeFileAsync(`${home}/file1`, "content1", "utf8");
 
-writeFile(joinPath(home, "dir", "file2"), "content2", "utf8");
+await writeFileAsync(`${home}/dir/file2`, "content2", "utf8");
 
-writeFile(joinPath(home, "dir", "file3"), "content3", "utf8");
+await writeFileAsync(`${home}/dir/file3`, "content3", "utf8");
 
-writeFile(
-  joinPath(home, ".ordering"),
-  ["  # comment  ", "  file1  ", "  \t  ", "dir"].join(EOL),
+await writeFileAsync(`${home}/dir/file4`, "content4", "utf8");
+
+await writeFileAsync(
+  `${home}/.ordering`,
+  ["  # comment  ", "\tfile1  ", "dir"].join("\n"),
   "utf8",
 );
 
-assertThrow(
-  () => loadOrdering(home, ".ordering", null, EOL, "utf8"),
-  /Error: Missing ordering file/u,
-);
+await writeFileAsync(`${home}/.ordering-ignore`, "*/file4", "utf8");
 
-assertDeepEqual(loadOrdering(home, ".ordering", "^", EOL, "utf8"), [
-  joinPath(home, "file1"),
-  joinPath(home, "dir", "file2"),
-  joinPath(home, "dir", "file3"),
+assertDeepEqual(await loadOrderingAsync(config), [
+  `${home}/file1`,
+  `${home}/dir/file2`,
+  `${home}/dir/file3`,
 ]);
 
-rm(home, { recursive: true });
+await writeFileAsync(`${home}/.ordering`, "file1\nfile1", "utf8");
+
+await assertRejectAsync(
+  loadOrderingAsync(config),
+  /^Error: Duplicate ordering occurence of /u,
+);
+
+await rmAsync(home, { recursive: true });

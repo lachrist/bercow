@@ -1,10 +1,9 @@
 import {
   assertEqual,
   assertDeepEqual,
-  getTemporaryPath,
+  makeTempDirAsync,
 } from "../../../test/fixture.mjs";
 import { EOL } from "node:os";
-import { join as joinPath } from "node:path";
 import {
   writeFile as writeFileAsync,
   readFile as readFileAsync,
@@ -13,32 +12,27 @@ import {
 } from "fs/promises";
 import { bercowAsync } from "./api.mjs";
 
-const home = getTemporaryPath();
+const {
+  process: { cwd: getCwd, chdir },
+} = global;
 
-await mkdirAsync(home);
+const home = await makeTempDirAsync();
 
-await mkdirAsync(joinPath(home, "directory"));
+const cwd = getCwd();
 
-await writeFileAsync(joinPath(home, "file1"), "content1", "utf8");
+chdir(home);
 
-await writeFileAsync(joinPath(home, "directory", "file2"), "content2", "utf8");
+await mkdirAsync("directory");
 
-await writeFileAsync(
-  joinPath(home, ".ordering"),
-  `file1${EOL}directory${EOL}`,
-  "utf8",
-);
+await writeFileAsync("file1", "content1", "utf8");
 
-await writeFileAsync(
-  joinPath(home, "directory", ".ordering"),
-  `file2${EOL}`,
-  "utf8",
-);
+await writeFileAsync("directory/file2", "content2", "utf8");
 
-const ordering = [
-  joinPath(home, "file1"),
-  joinPath(home, "directory", "file2"),
-];
+await writeFileAsync(".ordering", `file1${EOL}directory${EOL}`, "utf8");
+
+await writeFileAsync("directory/.ordering", `file2${EOL}`, "utf8");
+
+const ordering = ["file1", "directory/file2"];
 
 // initial //
 {
@@ -64,14 +58,14 @@ const ordering = [
   assertDeepEqual(trace, [
     {
       type: "link",
-      path: joinPath(home, "file1"),
+      path: "file1",
       infos: { index: 0, ordering },
     },
 
     {
       type: "lint",
       file: {
-        path: joinPath(home, "file1"),
+        path: "file1",
         content: "content1",
       },
       infos: { index: 0, ordering },
@@ -81,7 +75,7 @@ const ordering = [
       type: "test",
       files: [
         {
-          path: joinPath(home, "file1"),
+          path: "file1",
           content: "content1",
         },
       ],
@@ -90,13 +84,13 @@ const ordering = [
 
     {
       type: "link",
-      path: joinPath(home, "directory", "file2"),
+      path: "directory/file2",
       infos: { index: 1, ordering },
     },
     {
       type: "lint",
       file: {
-        path: joinPath(home, "directory", "file2"),
+        path: "directory/file2",
         content: "content2",
       },
       infos: { index: 1, ordering },
@@ -105,7 +99,7 @@ const ordering = [
       type: "test",
       files: [
         {
-          path: joinPath(home, "directory", "file2"),
+          path: "directory/file2",
           content: "content2",
         },
       ],
@@ -119,8 +113,8 @@ await bercowAsync({}, { clean: true }, home);
 await bercowAsync(
   {},
   {
-    "lint-cache-file": "./tmp/bercow-lint",
-    "test-cache-file": "./tmp/bercow-test",
+    "lint-cache-file": "tmp/bercow-lint",
+    "test-cache-file": "tmp/bercow-test",
   },
   home,
 );
@@ -128,7 +122,7 @@ await bercowAsync({}, {}, home);
 await bercowAsync({}, {}, home);
 
 // change //
-await writeFileAsync(joinPath(home, "file1"), "content3", "utf8");
+await writeFileAsync("file1", "content3", "utf8");
 await bercowAsync(
   {
     lint: ({ content }, _ordering) => `lint-${content}`,
@@ -137,14 +131,10 @@ await bercowAsync(
   home,
 );
 
-assertEqual(
-  await readFileAsync(joinPath(home, "file1"), "utf8"),
-  "lint-content3",
-);
+assertEqual(await readFileAsync("file1", "utf8"), "lint-content3");
 
-assertEqual(
-  await readFileAsync(joinPath(home, "directory", "file2"), "utf8"),
-  "content2",
-);
+assertEqual(await readFileAsync("directory/file2", "utf8"), "content2");
+
+chdir(cwd);
 
 await rmAsync(home, { recursive: true });

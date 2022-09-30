@@ -1,18 +1,23 @@
-import { join as joinPath } from "node:path";
+import { fromMaybe } from "./util.mjs";
 import * as Log from "./log.mjs";
-import { makeHashing, hashChunkArray } from "./hash.mjs";
-import { loadFile, saveFile, cleanupFile, hashFile } from "./file.mjs";
+import { hash } from "./hash.mjs";
 import {
-  makeCache,
-  updateCache,
-  resetCache,
-  readCache,
-  openCache,
-  closeCache,
+  loadFileAsync,
+  saveFileAsync,
+  cleanupFile,
+  hashFile,
+} from "./file.mjs";
+import {
+  createCacheAsync,
+  resetCacheAsync,
+  readCacheAsync,
+  openCacheAsync,
+  closeCacheAsync,
+  appendCache,
 } from "./cache.mjs";
 import { linkNothing, lintNothing, testNothing } from "./plugin.mjs";
-import { loadOrdering } from "./ordering.mjs";
-import { getDefaultConfig, resolveConfig } from "./config.mjs";
+import { loadOrderingAsync } from "./ordering.mjs";
+import { getDefaultConfig } from "./config.mjs";
 
 const {
   JSON: { stringify: stringifyJSON },
@@ -22,30 +27,30 @@ const linkAsync = async (path, infos, context) =>
   await context.link(path, infos);
 
 const lintAsync = async (path, infos, context) => {
-  const file = loadFile(path, context.hashing, context.encoding);
+  const file = await loadFileAsync(path, context.config);
   if (!context.achievements.has(hashFile(file))) {
-    saveFile(file, await context.lint(cleanupFile(file), infos));
+    await saveFileAsync(file, await context.lint(cleanupFile(file), infos));
     if (!context.achievements.has(hashFile(file))) {
       context.achievements.add(hashFile(file));
-      updateCache(context.lint_cache, hashFile(file));
+      appendCache(context.lint_cache, hashFile(file));
     }
   }
   return file;
 };
 
 const testAsync = async (files, infos, context) => {
-  const hash = hashChunkArray(files.map(hashFile), context.hashing);
+  const digest = hash(stringifyJSON(files.map(hashFile)), context.config);
   let step = context.iterator.next();
-  if (step.value !== hash) {
+  if (step.value !== digest) {
     while (!step.done) {
       step = context.iterator.next();
     }
     await context.test(files.map(cleanupFile), infos);
   }
-  updateCache(context.test_cache, hash);
+  appendCache(context.test_cache, digest);
 };
 
-export const bercowAsync = async (plugin, config, cwd) => {
+export const bercowAsync = async (plugin, config) => {
   plugin = {
     link: linkNothing,
     lint: lintNothing,
@@ -53,64 +58,40 @@ export const bercowAsync = async (plugin, config, cwd) => {
     ...plugin,
   };
 
-  config = resolveConfig(
-    {
-      ...getDefaultConfig(),
-      ...config,
-    },
+  config = {
+    ...getDefaultConfig(),
+    ...config,
+  };
 
-    cwd,
+  const ordering = await loadOrderingAsync(config);
+
+  const digest = hash(stringifyJSON(config), config);
+
+  const lint_cache = await createCacheAsync(
+    fromMaybe(config["lint-cache-file"], `tmp/bercow-${digest}-lint.txt`),
+    config,
   );
 
-  const ordering = loadOrdering(
-    config["target-directory"],
-    config["ordering-filename"],
-    config["ordering-pattern"],
-    config["ordering-separator"],
-    config.encoding,
-  );
-
-  const hashing = makeHashing(
-    config["hash-algorithm"],
-    config["hash-separator"],
-    config["hash-input-encoding"],
-    config["hash-output-encoding"],
-  );
-
-  const hash = hashChunkArray([stringifyJSON(config)], hashing);
-
-  const lint_cache = makeCache(
-    config["lint-cache-file"] === null
-      ? joinPath(cwd, "tmp", `bercow-${hash}-lint.txt`)
-      : config["lint-cache-file"],
-    config["cache-separator"],
-    config.encoding,
-  );
-
-  const test_cache = makeCache(
-    config["test-cache-file"] === null
-      ? joinPath(cwd, "tmp", `bercow-${hash}-test.txt`)
-      : config["test-cache-file"],
-    config["cache-separator"],
-    config.encoding,
+  const test_cache = await createCacheAsync(
+    fromMaybe(config["test-cache-file"], `tmp/bercow-${digest}-test.txt`),
+    config,
   );
 
   if (config.clean) {
-    resetCache(lint_cache);
-    resetCache(test_cache);
+    await resetCacheAsync(lint_cache);
+    await resetCacheAsync(test_cache);
   }
 
-  const lints = readCache(lint_cache);
-  const tests = readCache(test_cache);
-  resetCache(test_cache);
+  const lints = await readCacheAsync(lint_cache);
+  const tests = await readCacheAsync(test_cache);
+  await resetCacheAsync(test_cache);
 
-  openCache(lint_cache);
-  openCache(test_cache);
+  await openCacheAsync(lint_cache);
+  await openCacheAsync(test_cache);
 
   const context = {
     ...plugin,
-    encoding: config.encoding,
-    hashing,
+    config,
     lint_cache,
     test_cache,
     achievements: new Set(lints),
@@ -121,7 +102,7 @@ export const bercowAsync = async (plugin, config, cwd) => {
     const { length } = ordering;
     for (let index = 0; index < length; index += 1) {
       const path = ordering[index];
-      const infos = { cwd, index, ordering, ...Log };
+      const infos = { index, ordering, ...Log };
       const files = [];
       for (const link_path of await linkAsync(path, infos, context)) {
         files.push(await lintAsync(link_path, infos, context));
@@ -129,7 +110,7 @@ export const bercowAsync = async (plugin, config, cwd) => {
       await testAsync(files, infos, context);
     }
   } finally {
-    closeCache(lint_cache);
-    closeCache(test_cache);
+    await closeCacheAsync(lint_cache);
+    await closeCacheAsync(test_cache);
   }
 };

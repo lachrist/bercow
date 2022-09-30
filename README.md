@@ -4,7 +4,7 @@ A test runner with a plugin system that has a *strong* emphasis on running tests
 
 ## Example
 
-This repository
+This repository:
 - [config file](.bercowrc.yaml)
 - [top-level ordering](.ordering)
 - [package ordering](packages/.ordering)

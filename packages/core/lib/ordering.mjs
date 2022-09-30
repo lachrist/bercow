@@ -1,85 +1,107 @@
-import { join as joinPath } from "node:path";
-import { statSync as stat, readdirSync as readdir } from "node:fs";
-import { mapMaybe, readFileMaybe } from "./util.mjs";
+import { stat as statAsync } from "node:fs/promises";
+import Glob from "glob";
+import Minimatch from "minimatch";
+import {
+  promisify,
+  bindX_,
+  bind_X,
+  bind_XX,
+  unprefixString,
+  concatString,
+  compareString,
+  trimString,
+  doesNotMatchAnyRegExp,
+  readFileMissingAsync,
+  isDuplicate,
+} from "./util.mjs";
 
-const makeRegExp = (pattern) => new RegExp(pattern, "u");
+const { makeRe } = Minimatch;
+const { glob } = Glob;
 
-const trim = (string) => string.trim();
+const removeDot = bind_X(unprefixString, "./");
 
 const isNotEmptyLine = (string) => string !== "" && string[0] !== "#";
 
-const generatePredicate = (regexp) => (dirent) =>
-  dirent.isDirectory() || regexp.test(dirent.name);
+const parseList = (content, config) =>
+  content
+    .split(config["ordering-separator"])
+    .map(trimString)
+    .filter(isNotEmptyLine);
 
-const compare = (string1, string2) => string1.localeCompare(string2);
-
-const getName = ({ name }) => name;
-
-const generateExtend = (base) => (filename) => joinPath(base, filename);
-
-const loadDirectoryOrdering = (
-  directory_path,
-  ordering_filename,
-  predicate,
-  separator,
-  encoding,
-) => {
-  const maybe_buffer = readFileMaybe(
-    joinPath(directory_path, ordering_filename),
+const loadOrderingFileAsync = async (directory, config) =>
+  parseList(
+    await readFileMissingAsync(
+      `${directory}${config["ordering-filename"]}`,
+      config.encoding,
+      "*",
+    ),
+    config,
   );
-  if (maybe_buffer === null) {
-    if (predicate === null) {
-      throw new Error(
-        `Missing ordering file at ${directory_path} and no ordering-pattern config field was not defined`,
-      );
-    } else {
-      const filenames = readdir(directory_path, { withFileTypes: true })
-        .filter(predicate)
-        .map(getName);
-      filenames.sort(compare);
-      return filenames;
-    }
+
+const loadOrderingIgnoreFileAsync = async (directory, config) =>
+  parseList(
+    await readFileMissingAsync(
+      `${directory}${config["ordering-ignore-filename"]}`,
+      config.encoding,
+      "",
+    ),
+    config,
+  );
+
+const loadResourceAsync = async (path, ignore, config) => {
+  if ((await statAsync(path)).isDirectory()) {
+    return await loadDirectoryAsync(`${path}/`, ignore, config);
   } else {
-    return maybe_buffer
-      .toString(encoding)
-      .split(separator)
-      .map(trim)
-      .filter(isNotEmptyLine);
+    return [path];
   }
 };
 
-const generateLoadOrdering = (
-  ordering_filename,
-  predicate,
-  separator,
-  encoding,
-) =>
-  function self(path) {
-    if (stat(path).isDirectory()) {
-      return loadDirectoryOrdering(
-        path,
-        ordering_filename,
-        predicate,
-        separator,
-        encoding,
-      )
-        .map(generateExtend(path))
-        .flatMap(self);
-    } else {
-      return [path];
-    }
-  };
+const loadPatternAsync = async (pattern, ignore, config) => {
+  const paths = (await promisify(bindX_(glob, pattern)))
+    .map(removeDot)
+    .filter(bind_X(doesNotMatchAnyRegExp, ignore));
+  paths.sort(compareString);
+  return (
+    await Promise.all(paths.map(bind_XX(loadResourceAsync, ignore, config)))
+  ).flat();
+};
 
-export const loadOrdering = (
-  path,
-  ordering_filename,
-  pattern,
-  separator,
-  encoding,
-) =>
-  generateLoadOrdering(
-    ordering_filename,
-    mapMaybe(mapMaybe(pattern, makeRegExp), generatePredicate),
-    separator,
-    encoding,
-  )(path);
+const compileGlob = bind_X(makeRe, { nonegate: true });
+
+const loadDirectoryAsync = async (directory, ignore, config) => {
+  const resolve = bindX_(concatString, directory);
+  return (
+    await Promise.all(
+      (await loadOrderingFileAsync(directory, config))
+        .map(resolve)
+        .map(
+          bind_XX(
+            loadPatternAsync,
+            [
+              ...ignore,
+              ...(await loadOrderingIgnoreFileAsync(directory, config))
+                .map(resolve)
+                .map(compileGlob),
+            ],
+            config,
+          ),
+        ),
+    )
+  ).flat();
+};
+
+export const loadOrderingAsync = async (config) => {
+  const paths = await loadDirectoryAsync(
+    /* c8 ignore start */
+    config["target-directory"] === "." ? "" : `${config["target-directory"]}/`,
+    /* c8 ignore stop */
+    [],
+    config,
+  );
+  const duplicate = paths.find(isDuplicate);
+  if (duplicate === undefined) {
+    return paths;
+  } else {
+    throw new Error(`Duplicate ordering occurence of ${duplicate}`);
+  }
+};

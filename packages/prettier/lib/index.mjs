@@ -1,4 +1,3 @@
-import { relative as relativizePath } from "node:path";
 import { default as Prettier } from "prettier";
 
 const { format: formatPrettier, resolveConfig: resolvePrettierConfigAsync } =
@@ -14,8 +13,8 @@ export default async (config, _home) => {
       ? await resolvePrettierConfigAsync(config["prettier-options"])
       : config["prettier-options"];
   return {
-    lint: async ({ path, content }, { cwd, logSubtitle }) => {
-      logSubtitle(`formatting with prettier ${relativizePath(cwd, path)}`);
+    lint: async ({ path, content }, { logSubtitle }) => {
+      logSubtitle(`formatting with prettier ${path}`);
       return formatPrettier(content, {
         ...(options === null
           ? await resolvePrettierConfigAsync(path)

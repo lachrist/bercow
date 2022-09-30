@@ -1,11 +1,7 @@
-import { Buffer } from "node:buffer";
-import { relative as relativizePath } from "node:path";
 import { writeSync as write } from "node:fs";
 import { ESLint } from "eslint";
 
-const { from: toBuffer } = Buffer;
-
-export default async (config, _home) => {
+export default async (config) => {
   config = {
     formatter: "stylish",
     ...config,
@@ -13,12 +9,12 @@ export default async (config, _home) => {
   const eslint = new ESLint();
   const formatter = await eslint.loadFormatter(config.formatter);
   return {
-    lint: async ({ path, content }, { cwd, logSubtitle }) => {
-      logSubtitle(`linting with eslint ${relativizePath(cwd, path)}`);
+    lint: async ({ path, content }, { logSubtitle }) => {
+      logSubtitle(`linting with eslint ${path}`);
       const results = await eslint.lintText(content, { filePath: path });
       const message = await formatter.format(results);
       if (message !== "") {
-        write(1, toBuffer(message, "utf8"));
+        write(1, message, "utf8");
       }
       if (results[0].errorCount > 0) {
         throw new Error("eslint failure");

@@ -1,39 +1,44 @@
 import {
   assertEqual,
   assertDeepEqual,
-  getTemporaryPath,
+  makeTempDirAsync,
 } from "../../../test/fixture.mjs";
-import { EOL } from "node:os";
-import { writeFileSync as writeFile, readFileSync as readFile } from "node:fs";
 import {
-  makeCache,
-  readCache,
-  openCache,
-  closeCache,
-  resetCache,
-  updateCache,
+  writeFile as writeFileAsync,
+  readFile as readFileAsync,
+} from "node:fs/promises";
+import {
+  createCacheAsync,
+  readCacheAsync,
+  openCacheAsync,
+  closeCacheAsync,
+  resetCacheAsync,
+  appendCache,
 } from "./cache.mjs";
 
-const path = getTemporaryPath();
+const path = `${await makeTempDirAsync()}/cache.txt`;
 
-const cache = makeCache(path, EOL, "utf8");
+const cache = await createCacheAsync(path, {
+  "cache-separator": "-",
+  encoding: "utf8",
+});
 
-assertDeepEqual(readCache(cache), []);
+assertDeepEqual(await readCacheAsync(cache), []);
 
-writeFile(path, `entry1${EOL}entry2${EOL}`, "utf8");
+await writeFileAsync(path, `entry1-entry2-`, "utf8");
 
-assertDeepEqual(readCache(cache), ["entry1", "entry2"]);
+assertDeepEqual(await readCacheAsync(cache), ["entry1", "entry2"]);
 
-assertEqual(openCache(cache), undefined);
+assertEqual(await openCacheAsync(cache), undefined);
 
-updateCache(cache, "entry3");
+appendCache(cache, "entry3");
 
-assertEqual(readFile(path, "utf8"), `entry1${EOL}entry2${EOL}entry3${EOL}`);
+assertEqual(await readFileAsync(path, "utf8"), `entry1-entry2-entry3-`);
 
-assertEqual(closeCache(cache), undefined);
+assertEqual(await closeCacheAsync(cache), undefined);
 
-resetCache(cache);
+await resetCacheAsync(cache);
 
-resetCache(cache);
+await resetCacheAsync(cache);
 
-assertDeepEqual(readCache(cache), []);
+assertDeepEqual(await readCacheAsync(cache), []);

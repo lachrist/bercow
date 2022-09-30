@@ -1,26 +1,36 @@
 import {
   assertEqual,
   assertDeepEqual,
-  getTemporaryPath,
+  makeTempDirAsync,
 } from "../../../test/fixture.mjs";
-import { writeFileSync as writeFile, readFileSync as readFile } from "node:fs";
-import { makeHashing } from "./hash.mjs";
-import { loadFile, cleanupFile, hashFile, saveFile } from "./file.mjs";
+import {
+  writeFile as writeFileAsync,
+  readFile as readFileAsync,
+} from "node:fs/promises";
+import {
+  loadFileAsync,
+  cleanupFile,
+  hashFile,
+  saveFileAsync,
+} from "./file.mjs";
 
-const path = getTemporaryPath();
+const path = `${await makeTempDirAsync()}/file.txt`;
 
-writeFile(path, "content", "utf8");
+await writeFileAsync(path, "content", "utf8");
 
-const file = loadFile(
-  path,
-  makeHashing("sha256", "\0", "utf8", "utf8"),
-  "utf8",
-);
+const file = await loadFileAsync(path, {
+  encoding: "utf8",
+  "hash-algorithm": "sha256",
+  "hash-input-encoding": "utf8",
+  "hash-output-encoding": "base64",
+});
 
 assertDeepEqual(cleanupFile(file), { path, content: "content" });
 
 assertEqual(hashFile(file), hashFile(file));
 
-saveFile(file, "CONTENT");
+await saveFileAsync(file, "CONTENT");
 
-assertEqual(readFile(path, "utf8"), "CONTENT");
+assertDeepEqual(cleanupFile(file), { path, content: "CONTENT" });
+
+assertEqual(await readFileAsync(path, "utf8"), "CONTENT");

@@ -1,32 +1,35 @@
-import { assertEqual, getTemporaryPath } from "../../../test/fixture.mjs";
-import { join as joinPath } from "node:path";
+import { assertEqual, makeTempDirAsync } from "../../../test/fixture.mjs";
 import {
   writeFile as writeFileAsync,
   readFile as readFileAsync,
-  mkdir as mkdirAsync,
   rm as rmAsync,
 } from "fs/promises";
-import { runBercowAsync } from "./cli.mjs";
 
-const { stringify: stringifyJSON } = JSON;
+const {
+  process: { cwd: getCwd, chdir },
+  JSON: { stringify: stringifyJSON },
+} = global;
 
-const home = getTemporaryPath();
+const home = await makeTempDirAsync();
 
-await mkdirAsync(home);
+const cwd = getCwd();
+
+chdir(home);
+
+const { runBercowAsync } = await import("./cli.mjs");
 
 await writeFileAsync(
-  joinPath(home, ".bercow.json"),
+  ".bercow.json",
   stringifyJSON({ plugins: { "./plugin.mjs": "options" } }),
   "utf8",
 );
 
 await writeFileAsync(
-  joinPath(home, "plugin.mjs"),
+  "plugin.mjs",
   `
     import { equal as assertEqual } from "node:assert";
-    export default async (options, home) => {
+    export default async (options) => {
       assertEqual(options, "options");
-      assertEqual(home, ${JSON.stringify(home)});
       return {
         lint: async ({content}, _infos) => "lint-" + content,
       };
@@ -35,15 +38,17 @@ await writeFileAsync(
   "utf8",
 );
 
-await writeFileAsync(joinPath(home, ".ordering"), "foo", "utf8");
+await writeFileAsync(".ordering", "foo", "utf8");
 
-await writeFileAsync(joinPath(home, "foo"), "content", "utf8");
+await writeFileAsync("foo", "content", "utf8");
 
 assertEqual(
   await runBercowAsync([".bercow.json", "utf8", "--help", "--version"], home),
   undefined,
 );
 
-assertEqual(await readFileAsync(joinPath(home, "foo"), "utf8"), "lint-content");
+assertEqual(await readFileAsync("foo", "utf8"), "lint-content");
+
+chdir(cwd);
 
 await rmAsync(home, { recursive: true });

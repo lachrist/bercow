@@ -1,13 +1,9 @@
 /* eslint-env node */
 
 import { assertEqual } from "../../../test/fixture.mjs";
-import { join as joinPath } from "node:path";
 import plugin from "./index.mjs";
 
-const cwd = process.cwd();
-
 const infos = {
-  cwd,
   index: 0,
   ordering: [],
   logTitle: (_title) => {},
@@ -16,21 +12,21 @@ const infos = {
 };
 
 const file = {
-  path: joinPath(cwd, "file.mjs"),
+  path: "file.mjs",
   content: "{ 123; }",
 };
 
 {
-  const { lint } = await plugin({ "prettier-options": { tabWidth: 0 } }, cwd);
+  const { lint } = await plugin({ "prettier-options": { tabWidth: 0 } });
   assertEqual(await lint(file, infos), "{\n123;\n}\n");
 }
 
 {
-  const { lint } = await plugin({}, cwd);
+  const { lint } = await plugin({});
   assertEqual(await lint(file, infos), "{\n  123;\n}\n");
 }
 
 {
-  const { lint } = await plugin({ "prettier-options": "prettierrc.yaml" }, cwd);
+  const { lint } = await plugin({ "prettier-options": "prettierrc.yaml" });
   assertEqual(await lint(file, infos), "{\n  123;\n}\n");
 }

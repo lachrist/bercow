@@ -1,8 +1,1 @@
-spawn
-link-adjacent
-link-separate
-order-esm-import
-prettier
-eslint
-c8
-core
+*/lib

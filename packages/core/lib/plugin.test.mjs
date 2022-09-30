@@ -1,20 +1,19 @@
 import {
   assertEqual,
   assertDeepEqual,
-  getTemporaryPath,
+  makeTempDirAsync,
 } from "../../../test/fixture.mjs";
-import { writeFileSync as writeFile } from "node:fs";
+import { writeFile as writeFileAsync } from "node:fs/promises";
 import { loadPluginAsync, combinePluginArray } from "./plugin.mjs";
 
-const path = `${getTemporaryPath()}.mjs`;
+const path = `${await makeTempDirAsync()}/plugin.mjs`;
 
-writeFile(
+await writeFileAsync(
   path,
   `
     import {equal as assertEqual} from "node:assert";
-    export default async (options, home) => {
+    export default async (options) => {
       assertEqual(options, "options");
-      assertEqual(home, "/home");
       return {
         test: async () => {},
       };
@@ -24,7 +23,7 @@ writeFile(
 );
 
 assertEqual(
-  await (await loadPluginAsync(path, "options", "/home")).test([], 0, []),
+  await (await loadPluginAsync(`./${path}`, "options")).test([], 0, []),
   undefined,
 );
 

@@ -1,5 +1,5 @@
 /* eslint-env node */
-import { relative as relativizePath } from "node:path";
+import { resolve as resolvePath } from "node:path";
 import { platform } from "node:os";
 import { spawnAsync } from "./spawn.mjs";
 
@@ -15,7 +15,7 @@ const {
 
 const generateSubstitute = (env) => (arg) => hasOwn(env, arg) ? env[arg] : arg;
 
-export default async (config, home) => {
+export default async (config) => {
   config = {
     command: null,
     argv: ["$TEST"],
@@ -29,11 +29,9 @@ export default async (config, home) => {
   return {
     test: async (
       [{ path: main }, { path: test }],
-      { cwd, logSubtitle, logParagraph },
+      { logSubtitle, logParagraph },
     ) => {
-      logSubtitle(
-        `testing with ${config.command} ${relativizePath(cwd, main)}`,
-      );
+      logSubtitle(`testing with ${config.command} ${main}`);
       await spawnAsync(
         logParagraph,
         config.command,
@@ -41,16 +39,13 @@ export default async (config, home) => {
           generateSubstitute({
             $TEST: test,
             $MAIN: main,
-            $ABSOLUTE_TEST_PATH: test,
-            $ABSOLUTE_MAIN_PATH: main,
-            $RELATIVE_TEST_PATH: relativizePath(home, test),
-            $RELATIVE_MAIN_PATH: relativizePath(home, main),
+            $ABSOLUTE_TEST_PATH: resolvePath(test),
+            $ABSOLUTE_MAIN_PATH: resolvePath(main),
+            $RELATIVE_TEST_PATH: test,
+            $RELATIVE_MAIN_PATH: main,
           }),
         ),
-        {
-          ...config.options,
-          cwd: home,
-        },
+        config.options,
       );
     },
   };

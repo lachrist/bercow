@@ -1,14 +1,12 @@
-import {
-  resolve as resolvePath,
-  dirname as getDirectory,
-  relative as relativizePath,
-} from "node:path";
 import { parse as parseBabel } from "@babel/parser";
 import BabelGenerator from "@babel/generator";
 
 const { default: generateBabel } = BabelGenerator;
 
-const { stringify: stringifyJSON } = JSON;
+const {
+  JSON: { stringify: stringifyJSON },
+  URL,
+} = global;
 
 const default_babel_parser_options = {
   sourceType: "module",
@@ -29,12 +27,15 @@ const isImport = (statement) =>
   (statement.type === "ExportNamedDeclaration" && statement.source !== null) ||
   statement.type === "ExportAllDeclaration";
 
-const orderImportStatement = (statement, base, ordering, index) => {
+const normalize = (path) =>
+  new URL(path, "protocol://host/").pathname.substring(1);
+
+const orderImportStatement = (statement, path, ordering, index) => {
   const {
     source: { value: source },
   } = statement;
   const resolved_source =
-    source[0] === "." ? resolvePath(base, source) : source;
+    source[0] === "." ? normalize(`${path}/../${source}`) : source;
   const order = ordering.indexOf(resolved_source);
   if (order > index) {
     throw new Error(
@@ -89,6 +90,8 @@ const isEqualShallowArray = (array1, array2) => {
   }
 };
 
+const bind_XXX = (f, x2, x3, x4) => (x1) => f(x1, x2, x3, x4);
+
 const getStatement = ({ statement }) => statement;
 
 const removeLocation = ({ loc: _loc, ...rest }) => rest;
@@ -96,7 +99,7 @@ const removeLocation = ({ loc: _loc, ...rest }) => rest;
 const compareOrderedStatement = ({ order: order1 }, { order: order2 }) =>
   order1 - order2;
 
-export default async (config, _home) => {
+export default async (config) => {
   config = {
     "babel-generator-options": null,
     "babel-parser-options": null,
@@ -112,13 +115,12 @@ export default async (config, _home) => {
     ...config["babel-parser-options"],
   };
   return {
-    lint: async ({ path, content }, { cwd, logSubtitle, ordering, index }) => {
-      logSubtitle(`ordering esm imports of ${relativizePath(cwd, path)}`);
+    lint: async ({ path, content }, { logSubtitle, ordering, index }) => {
+      logSubtitle(`ordering esm imports of ${path}`);
       const { program } = parseBabel(content, babel_parser_options);
       const { head, body } = splitProgramBody(program.body);
-      const base = getDirectory(path);
-      const ordered_head = head.map((statement) =>
-        orderImportStatement(statement, base, ordering, index),
+      const ordered_head = head.map(
+        bind_XXX(orderImportStatement, path, ordering, index),
       );
       if (config.fix) {
         const sorted_ordered_head = ordered_head.slice();

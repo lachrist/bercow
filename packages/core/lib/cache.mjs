@@ -1,79 +1,47 @@
-import { dirname as getDirectory } from "node:path";
+import { open as openAsync, mkdir as mkdirAsync } from "node:fs/promises";
 import {
-  readFileSync as readFile,
-  openSync as open,
-  closeSync as close,
-  unlinkSync as unlink,
-  mkdirSync as mkdir,
-  writeSync as write,
-} from "node:fs";
-import { Buffer } from "node:buffer";
-import { assert } from "./util.mjs";
+  assert,
+  isNotEmptyString,
+  readFileMissingAsync,
+  unlinkMissingAsync,
+} from "./util.mjs";
 
-/* c8 ignore start */
-const {
-  undefined,
-  Reflect: { getOwnPropertyDescriptor },
-  Object: {
-    hasOwn = (object, key) =>
-      getOwnPropertyDescriptor(object, key) !== undefined,
-  },
-} = global;
-/* c8 ignore stop */
-
-const { from: toBuffer } = Buffer;
-
-const isNotEmptyString = (any) => any !== "";
-
-export const makeCache = (path, separator, encoding) => {
-  mkdir(getDirectory(path), { recursive: true });
+export const createCacheAsync = async (path, config) => {
+  const segments = path.split("/");
+  segments.pop();
+  await mkdirAsync(segments.join("/"), { recursive: true });
   return {
     path,
-    encoding,
-    separator,
-    fd: null,
+    handle: null,
+    config,
   };
 };
 
-export const readCache = (cache) => {
-  let content = "";
-  try {
-    content = readFile(cache.path).toString(cache.encoding);
-  } catch (error) {
-    /* c8 ignore start */
-    if (!hasOwn(error, "code") || error.code !== "ENOENT") {
-      throw error;
-    }
-    /* c8 ignore stop */
-  }
-  return content.split(cache.separator).filter(isNotEmptyString);
+export const readCacheAsync = async (cache) =>
+  (await readFileMissingAsync(cache.path, cache.config.encoding, ""))
+    .split(cache.config["cache-separator"])
+    .filter(isNotEmptyString);
+
+export const resetCacheAsync = async (cache) => {
+  assert(cache.handle === null, "cache not closed");
+  await unlinkMissingAsync(cache.path);
 };
 
-export const resetCache = (cache) => {
-  assert(cache.fd === null, "cache not closed");
-  try {
-    unlink(cache.path);
-  } catch (error) {
-    /* c8 ignore start */
-    if (!hasOwn(error, "code") || error.code !== "ENOENT") {
-      throw error;
-    }
-    /* c8 ignore stop */
-  }
+export const openCacheAsync = async (cache) => {
+  assert(cache.handle === null, "cache not closed");
+  cache.handle = await openAsync(cache.path, "a");
 };
 
-export const openCache = (cache) => {
-  assert(cache.fd === null, "cache not closed");
-  cache.fd = open(cache.path, "a");
+export const closeCacheAsync = async (cache) => {
+  assert(cache.handle !== null, "cache not opened");
+  await cache.handle.close();
+  cache.handle = null;
 };
 
-export const closeCache = (cache) => {
-  assert(cache.fd !== null, "cache not opened");
-  close(cache.fd);
-  cache.fd = null;
-};
-
-export const updateCache = (cache, entry) => {
-  assert(cache.fd !== null, "cache not opened");
-  write(cache.fd, toBuffer(`${entry}${cache.separator}`, cache.encoding));
+export const appendCache = (cache, entry) => {
+  assert(cache.handle !== null, "cache not opened");
+  cache.handle.write(
+    `${entry}${cache.config["cache-separator"]}`,
+    cache.config.encoding,
+  );
 };

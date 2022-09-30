@@ -1,53 +1,44 @@
 import {
-  getTemporaryPath,
+  makeTempDirAsync,
   assertEqual,
-  assertThrow,
+  assertDeepEqual,
+  assertRejectAsync,
 } from "../../../test/fixture.mjs";
-import {
-  writeFileSync as writeFile,
-  mkdirSync as mkdir,
-  rmSync as rm,
-} from "node:fs";
-import { join as joinPath } from "node:path";
-import {
-  getDefaultConfig,
-  resolveConfig,
-  resolveConfigPath,
-  loadConfig,
-} from "./config.mjs";
+import { writeFile as writeFileAsync, rm as rmAsync } from "node:fs/promises";
+import { getDefaultConfig, loadConfigAsync } from "./config.mjs";
 
 const {
+  process: { chdir, cwd: getCwd },
   JSON: { stringify: stringifyJSON },
 } = global;
 
-const home = getTemporaryPath();
+assertEqual(typeof getDefaultConfig(), "object");
 
-mkdir(home);
+const home = await makeTempDirAsync();
 
-assertThrow(
-  () => resolveConfigPath(null, home),
-  /^Error: Could not find bercow configuration file/u,
+const cwd = getCwd();
+
+chdir(home);
+
+await assertRejectAsync(
+  loadConfigAsync(null),
+  /^Error: Could not find bercow configuration file at /u,
 );
 
-writeFile(
-  joinPath(home, ".bercowrc.json"),
-  stringifyJSON({ "target-directory": "./json" }),
+await writeFileAsync(".bercowrc", "target-directory: yaml", "utf8");
+
+assertDeepEqual(await loadConfigAsync(null), { "target-directory": "yaml" });
+
+await writeFileAsync(
+  ".bercowrc.json",
+  stringifyJSON({ "target-directory": "json" }),
   "utf8",
 );
 
-writeFile(joinPath(home, ".bercowrc"), "target-directory: ./yaml", "utf8");
+assertDeepEqual(await loadConfigAsync(".bercowrc.json"), {
+  "target-directory": "json",
+});
 
-const test = (maybe) =>
-  resolveConfig(
-    {
-      ...getDefaultConfig(),
-      ...loadConfig(resolveConfigPath(maybe, home), "utf8"),
-    },
-    home,
-  )["target-directory"];
+chdir(cwd);
 
-assertEqual(test(null), joinPath(home, "json"));
-
-assertEqual(test(".bercowrc"), joinPath(home, "yaml"));
-
-rm(home, { recursive: true });
+await rmAsync(home, { recursive: true });

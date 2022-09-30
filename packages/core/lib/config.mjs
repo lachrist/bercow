@@ -1,18 +1,16 @@
-import { extname as getExtension, resolve as resolvePath } from "node:path";
-import { readdirSync as readdir, readFileSync as readFile } from "node:fs";
+import {
+  readdir as readdirAsync,
+  readFile as readFileAsync,
+} from "node:fs/promises";
+import { extname as getExtension } from "node:path";
 import { EOL } from "node:os";
 import { load as parseYAML } from "js-yaml";
+import { hasOwn } from "./util.mjs";
 
-/* c8 ignore start */
 const {
+  process: { cwd },
   JSON: { parse: parseJSON },
-  Reflect: { getOwnPropertyDescriptor },
-  Object: {
-    hasOwn = (object, key) =>
-      getOwnPropertyDescriptor(object, key) !== undefined,
-  },
 } = global;
-/* c8 ignore stop */
 
 const parsers = {
   ".json": parseJSON,
@@ -29,57 +27,41 @@ const default_config_filename_array = [
 
 export const default_config = {
   clean: false,
-  plugins: [],
   encoding: "utf8",
   "target-directory": ".",
   "cache-separator": EOL,
+  "ordering-separator": EOL,
   "lint-cache-file": null,
   "test-cache-file": null,
   "ordering-filename": ".ordering",
-  "ordering-pattern": null,
-  "ordering-separator": EOL,
+  "ordering-ignore-filename": ".ordering-ignore",
   "hash-algorithm": "sha256",
   "hash-input-encoding": "utf8",
   "hash-output-encoding": "base64",
-  "hash-separator": "\0",
 };
 
-const path_key_array = [
-  "lint-cache-file",
-  "test-cache-file",
-  "target-directory",
-];
+export const getDefaultConfig = () => default_config;
 
 const getParser = (extension) =>
   hasOwn(parsers, extension) ? parsers[extension] : parseYAML;
 
-export const getDefaultConfig = () => default_config;
-
-export const resolveConfig = (config, home) => {
-  config = { ...config };
-  for (const key of path_key_array) {
-    if (hasOwn(config, key) && config[key] !== null) {
-      config[key] = resolvePath(home, config[key]);
-    }
-  }
-  return config;
-};
-
-export const resolveConfigPath = (maybe_relative_path, cwd) => {
-  if (maybe_relative_path === null) {
-    const filenames = readdir(cwd);
-    for (const filename1 of default_config_filename_array) {
-      for (const filename2 of filenames) {
-        if (filename1 === filename2) {
-          return resolvePath(cwd, filename1);
-        }
+const resolveConfigFilenameAsync = async (maybe_filename) => {
+  if (maybe_filename === null) {
+    const filenames = await readdirAsync(".");
+    for (const default_filename of default_config_filename_array) {
+      if (filenames.includes(default_filename)) {
+        return default_filename;
       }
     }
-    throw new Error(`Could not find bercow configuration file at ${cwd}`);
+    throw new Error(`Could not find bercow configuration file at ${cwd()}`);
   } else {
-    return resolvePath(cwd, maybe_relative_path);
+    return maybe_filename;
   }
 };
 
-export const loadConfig = (path, encoding) =>
-  getParser(getExtension(path))(readFile(path).toString(encoding));
+export const loadConfigAsync = async (maybe_filename, encoding) => {
+  const filename = await resolveConfigFilenameAsync(maybe_filename);
+  return getParser(getExtension(filename))(
+    await readFileAsync(filename, encoding),
+  );
+};

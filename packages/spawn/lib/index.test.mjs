@@ -1,14 +1,12 @@
-import { assertEqual } from "../../../test/fixture.mjs";
+import { assertEqual, makeTempDirAsync } from "../../../test/fixture.mjs";
 import {
   writeFile as writeFileAsync,
   unlink as unlinkAsync,
 } from "fs/promises";
 import { tmpdir as getTmpdir, platform } from "node:os";
-import { join as joinPath } from "node:path";
 import plugin from "./index.mjs";
 
 const infos = {
-  cwd: "/cwd",
   index: 0,
   ordering: [],
   logTitle: (_title) => {},
@@ -16,12 +14,7 @@ const infos = {
   logParagraph: (_paragraph) => {},
 };
 
-const path = joinPath(
-  getTmpdir(),
-  `bercow-${Date.now().toString(36)}-${Math.random()
-    .toString(36)
-    .slice(2)}.mjs`,
-);
+const path = `${await makeTempDirAsync()}/main.mjs`;
 
 await writeFileAsync(path, "123;");
 

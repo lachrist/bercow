@@ -1,21 +1,17 @@
-import { join as joinPath } from "node:path";
-import { assertEqual, assertReject } from "../../../test/fixture.mjs";
+import { assertEqual, assertRejectAsync } from "../../../test/fixture.mjs";
 import { format as formatPrettier } from "prettier";
 import plugin from "./index.mjs";
-
-const cwd = process.cwd();
 
 const testAsync = async (content, options, infos) => {
   const { lint } = await plugin(options, "/home");
   return await lint(
     {
-      path: joinPath(cwd, "main.mjs"),
+      path: "main.mjs",
       content,
     },
     {
-      cwd,
       index: 0,
-      ordering: [joinPath(cwd, "main.mjs")],
+      ordering: ["main.mjs"],
       logTitle: (_title) => {},
       logSubtitle: (_subtitle) => {},
       logParagraph: (_paragraph) => {},
@@ -25,19 +21,19 @@ const testAsync = async (content, options, infos) => {
 };
 
 // import statement not in head //
-await assertReject(
+await assertRejectAsync(
   testAsync(`123; export {field} from "package";`, {}, {}),
   /^Error: Import statement should appear before any other statements/u,
 );
 
 // imported untested file //
-await assertReject(
+await assertRejectAsync(
   testAsync(
     `import "./dep.mjs";`,
     {},
     {
       index: 0,
-      ordering: [joinPath(cwd, "main.mjs"), joinPath(cwd, "dep.mjs")],
+      ordering: ["main.mjs", "dep.mjs"],
     },
   ),
 
@@ -45,17 +41,13 @@ await assertReject(
 );
 
 // ordering mismatch //
-await assertReject(
+await assertRejectAsync(
   testAsync(
     `import "./dep2.mjs"; import "./dep1.mjs";`,
     { fix: false },
     {
       index: 2,
-      ordering: [
-        joinPath(cwd, "dep1.mjs"),
-        joinPath(cwd, "dep2.mjs"),
-        joinPath(cwd, "main.mjs"),
-      ],
+      ordering: ["dep1.mjs", "dep2.mjs", "main.mjs"],
     },
   ),
 
@@ -63,13 +55,13 @@ await assertReject(
 );
 
 // missing ordering mismatch //
-await assertReject(
+await assertRejectAsync(
   testAsync(
     `import "./dep.mjs"; import "package";`,
     { fix: false },
     {
       index: 2,
-      ordering: [joinPath(cwd, "dep.mjs"), joinPath(cwd, "main.mjs")],
+      ordering: ["dep.mjs", "main.mjs"],
     },
   ),
 
@@ -85,7 +77,7 @@ await assertReject(
       { fix: false },
       {
         index: 2,
-        ordering: [joinPath(cwd, "dep.mjs"), joinPath(cwd, "main.mjs")],
+        ordering: ["dep.mjs", "main.mjs"],
       },
     ),
 
@@ -102,7 +94,7 @@ await assertReject(
       { fix: true },
       {
         index: 2,
-        ordering: [joinPath(cwd, "dep.mjs"), joinPath(cwd, "main.mjs")],
+        ordering: ["dep.mjs", "main.mjs"],
       },
     ),
 
@@ -119,13 +111,13 @@ await assertReject(
         { fix: true },
         {
           index: 2,
-          ordering: [joinPath(cwd, "dep.mjs"), joinPath(cwd, "main.mjs")],
+          ordering: ["dep.mjs", "main.mjs"],
         },
       ),
-      { filepath: joinPath(cwd, "main.mjs") },
+      { filepath: "main.mjs" },
     ),
     formatPrettier(`import "package"; import "./dep.mjs";`, {
-      filepath: joinPath(cwd, "main.mjs"),
+      filepath: "main.mjs",
     }),
   );
 }
