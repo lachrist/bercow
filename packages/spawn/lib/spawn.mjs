@@ -14,10 +14,11 @@ export const spawnAsync = (logParagraph, command, argv, options) =>
     child.stderr.on("data", logParagraph);
     child.on("error", reject);
     child.on("exit", (status, signal) => {
-      /* c8 ignore start: code not exercised on windows */
+      // windows coverage issue
+      /* c8 ignore start */
       if (signal !== null) {
         reject(new Error(`${command} ${argv.join(" ")} killed with ${signal}`));
-      } else if (status !== 0) {
+      } /* c8 ignore stop */ else if (status !== 0) {
         reject(
           new Error(
             `${command} ${argv.join(" ")} failed with ${String(status)}`,
@@ -26,6 +27,5 @@ export const spawnAsync = (logParagraph, command, argv, options) =>
       } else {
         resolve(undefined);
       }
-      /* c8 ignore stop */
     });
   });
