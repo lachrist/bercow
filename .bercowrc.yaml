@@ -3,7 +3,7 @@ plugins:
   '@bercow/order-esm-import':
     fix: true
   '@bercow/prettier':
-    prettier-options: .prettierrc.yml
+    prettier-options: '.'
   '@bercow/eslint':
     babel-parser-options:
       sourceType: module
